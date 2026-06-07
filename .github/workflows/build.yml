@@ -19,24 +19,23 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-
-    - name: Initialize Fabric Project
+    - name: Install Gradle Globally
       run: |
-        # Этот скрипт сам развернет чистый шаблон Fabric 1.21.4 прямо на сервере, если его еще нет
-        if [ ! -f "build.gradle" ]; then
-          curl -Lo template.zip https://github.com/FabricMC/fabric-example-mod/archive/refs/heads/1.21.4.zip
-          unzip template.zip
-          cp -r fabric-example-mod-1.21.4/* .
-          rm -rf fabric-example-mod-1.21.4 template.zip
-        fi
+        sudo apt-get update
+        sudo apt-get install -y wget unzip
+        wget https://services.gradle.org/distributions/gradle-8.10-bin.zip
+        sudo mkdir /opt/gradle
+        sudo unzip -d /opt/gradle gradle-8.10-bin.zip
+        export PATH=$PATH:/opt/gradle/gradle-8.10/bin
+        echo "/opt/gradle/gradle-8.10/bin" >> $GITHUB_PATH
 
-    - name: Build with Gradle
-      run: chmod +x gradlew && ./gradlew build
+    - name: Build Mod with Global Gradle
+      run: gradle build --no-daemon
+      env:
+        GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
     - name: Upload Mod Jar
       uses: actions/upload-artifact@v4
       with:
-        name: MyVisualMod-1.21.4
+        name: AuraVisual-1.21.4
         path: build/libs/*.jar
