@@ -3,30 +3,31 @@ package com.auravisual;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.item.Items;
+import net.minecraft.text.Text;
 
 public class ItemSwapLogic {
 
-    // Метод, который ищет сферу и меняет её с предметом в руке
-    public static void trySwap() {
+    // Метод, который вызывается при нажатии кнопки 'R'
+    public static void executeSwap() {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.interactionManager == null) return;
+        if (client.player == null) return;
+
+        // Если функция выключена в ClickGUI, ничего не делаем
+        if (!FeatureManager.itemSwapVisual) return;
 
         PlayerInventory inventory = client.player.getInventory();
-        int currentHandSlot = inventory.selectedSlot; // Слот, который сейчас в руке (0-8)
-
-        // 1. Ищем сферу или талисман в инвентаре (проверяем все 36 слотов)
-        int targetSlot = -1;
-        for (int i = 0; i < 36; i++) {
-            // Пропускаем слот, который уже зажат в руке
-            if (i == currentHandSlot) continue;
-
+        
+        // Пример простой логики: ищем Тотем бессмертия на панели быстрого доступа (слоты 0-8)
+        for (int i = 0; i < 9; i++) {
             ItemStack stack = inventory.getStack(i);
-            if (!stack.isEmpty()) {
-                // Получаем название предмета
-                String itemName = stack.getName().getString().toLowerCase();
-
-                // ПРОВЕРКА: если в названии есть "сфера" или "талисман"
-                if (itemName.contains("сфера") || itemName.contains("талисман") || itemName.contains("talisman") || itemName.contains("sphere")) {
-                    targetSlot = i;
-                    break
+            
+            // Если нашли тотем и он НЕ в руке прямо сейчас
+            if (stack.isOf(Items.TOTEM_OF_UNDYING) && inventory.selectedSlot != i) {
+                inventory.selectedSlot = i; // Быстро переключаем руку на этот слот
+                client.player.sendMessage(Text.literal("§d[AuraVisual] §fПредмет успешно сменен!"), true);
+                break; // Точка с запятой на месте, выходим из цикла!
+            }
+        }
+    }
+}
