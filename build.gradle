@@ -25,9 +25,8 @@ dependencies {
 
 processResources {
     inputs.property "version", project.version
-    filteringCharset "UTF-8"
 
-    filesLike("fabric.mod.json").each {
+    filesMatching("fabric.mod.json") {
         expand "version": project.version
     }
 }
