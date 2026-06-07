@@ -1,0 +1,42 @@
+name: Build Fabric Mod
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+
+    - name: Initialize Fabric Project
+      run: |
+        # Этот скрипт сам развернет чистый шаблон Fabric 1.21.4 прямо на сервере, если его еще нет
+        if [ ! -f "build.gradle" ]; then
+          curl -Lo template.zip https://github.com/FabricMC/fabric-example-mod/archive/refs/heads/1.21.4.zip
+          unzip template.zip
+          cp -r fabric-example-mod-1.21.4/* .
+          rm -rf fabric-example-mod-1.21.4 template.zip
+        fi
+
+    - name: Build with Gradle
+      run: chmod +x gradlew && ./gradlew build
+
+    - name: Upload Mod Jar
+      uses: actions/upload-artifact@v4
+      with:
+        name: MyVisualMod-1.21.4
+        path: build/libs/*.jar
