@@ -14,23 +14,22 @@ public class AuraVisualClient {
     private static long currentDelay = 0L;
     private static final Random random = new Random();
 
-    // Этот метод вызывается каждый тик из обработчика событий мода
     public static void onClientTick(MinecraftClient mc) {
         if (mc.player == null || mc.world == null) return;
 
-        // ПРОВЕРКА 1: Быстрый обходящий античиты TriggerBot
+        // 1. Работает TriggerBot
         if (FeatureManager.triggerBot) {
             runSmartTriggerBot(mc);
         }
 
-        // ПРОВЕРКА 2: Параллельно может работать TargetHUD
+        // 2. Параллельно и одновременно работает TargetHUD
         if (FeatureManager.targetHUD) {
-            // Твоя логика рендеринга TargetHUD
+            // Твоя логика отображения TargetHUD
         }
 
-        // ПРОВЕРКА 3: Параллельно может работать GlowESP
+        // 3. Одновременно работает GlowESP
         if (FeatureManager.glowESP) {
-            // Твоя логика рендеринга ESP
+            // Твоя логика отображения ESP
         }
     }
 
@@ -41,9 +40,7 @@ public class AuraVisualClient {
             EntityHitResult entityHitResult = (EntityHitResult) hitResult;
             Entity target = entityHitResult.getEntity();
 
-            // Проверяем живую цель
             if (target instanceof LivingEntity && target.isAlive() && target != mc.player) {
-                
                 long currentTime = System.currentTimeMillis();
                 
                 // Проверяем, прошла ли динамическая задержка
@@ -51,8 +48,7 @@ public class AuraVisualClient {
                     return;
                 }
 
-                // КРИТЫ: Легитная проверка условий падения персонажа.
-                // Не дает флагов, так как полностью использует физику игры.
+                // КРИТЫ: Легитная проверка условий падения персонажа
                 boolean isCritPhase = !mc.player.isOnGround() 
                         && mc.player.fallDistance > 0.0F 
                         && !mc.player.isClimbing() 
@@ -60,16 +56,12 @@ public class AuraVisualClient {
 
                 if (isCritPhase) {
                     if (mc.interactionManager != null) {
-                        // Наносим удар
                         mc.interactionManager.attackEntity(mc.player, target);
                         mc.player.swingHand(Hand.MAIN_HAND);
                         
-                        // Обновляем время атаки
                         lastAttackTime = currentTime;
                         
-                        // РАНДОМИЗАЦИЯ ДЛЯ ОБХОДА ПОЛЯРА/СЛОТА:
-                        // Интервал 100-150 мс симулирует отличные клики (~8 CPS) 
-                        // с постоянно меняющимися промежутками. Античит думает, что кликает человек.
+                        // РАНДОМИЗАЦИЯ ДЛЯ ОБХОДА ПОЛЯРА/СЛОТА (100-150 мс)
                         currentDelay = 100 + random.nextInt(50); 
                     }
                 }
