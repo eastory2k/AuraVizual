@@ -100,7 +100,7 @@ public class ClickGUI extends Screen {
         ctx.fill(bx, by, bx + bWidth, by + 18, bgColor);
         ctx.fill(bx, by, bx + 3, by + 18, FeatureManager.clientColor);
         ctx.drawText(this.textRenderer, name, bx + 10, by + 5, 0xFFFFFFFF, false);
-        ctx.drawText(this.textMainWindow - 65, by + 5, FeatureManager.clientColor, false);
+        // ИСПРАВЛЕНО: Удалена битая строка с textMainWindow
         ctx.drawText(this.textRenderer, "[ СМЕНИТЬ ]", bx + bWidth - 65, by + 5, FeatureManager.clientColor, false);
     }
 
