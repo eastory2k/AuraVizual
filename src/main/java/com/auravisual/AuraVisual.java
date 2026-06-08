@@ -12,7 +12,6 @@ public class AuraVisual implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        // Регистрируем кнопку Правый Shift для открытия меню ClickGUI
         openGuiKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.auravisual.open", 
                 InputUtil.Type.KEYSYM, 
@@ -20,10 +19,8 @@ public class AuraVisual implements ClientModInitializer {
                 "category.auravisual"
         ));
 
-        // Оставляем общий клиентский тик
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player != null && client.world != null) {
-                // Проверяем нажатие кнопки
                 if (openGuiKey.wasPressed() && client.currentScreen == null) {
                     client.setScreen(new ClickGUI());
                 }
