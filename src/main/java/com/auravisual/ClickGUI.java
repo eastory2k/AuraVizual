@@ -21,7 +21,7 @@ public class ClickGUI extends Screen {
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
-        // Основной плотный фон меню (непрозрачный, без размытия)
+        // Основной плотный фон меню
         context.fill(x, y, x + width, y + height, 0xF60F0F0F); 
         context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
@@ -91,7 +91,9 @@ public class ClickGUI extends Screen {
         
         String status = active ? "• ON" : "• OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x50FFFFFF;
-        ctx.drawText(ctx.drawContext, this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
+        
+        // ИСПРАВЛЕНО: ctx.drawContext удален, теперь компилируется успешно!
+        ctx.drawText(this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
     }
 
     private void drawColorBtn(DrawContext ctx, int bx, int by, int bWidth, String name, int mx, int my) {
@@ -122,7 +124,7 @@ public class ClickGUI extends Screen {
             if (mouseX >= x + 150 && mouseX <= x + 230) { currentTab = 2; return true; }
         }
 
-        // Клик по кнопкам внутри вкладок (Все проверки независимы!)
+        // Клик по кнопкам (Все проверки идут независимо друг от друга!)
         if (mouseX >= bx && mouseX <= bx + bWidth) {
             if (currentTab == 0) {
                 if (mouseY >= startY && mouseY <= startY + 18) { 
