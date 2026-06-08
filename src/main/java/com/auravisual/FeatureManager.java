@@ -30,11 +30,11 @@ public class FeatureManager {
 
     public static void toggleColor() {
         if (clientColor == 0xFFFF0000) {
-            clientColor = 0xFF00FF00; // переключаем на зеленый
+            clientColor = 0xFF00FF00;
         } else if (clientColor == 0xFF00FF00) {
-            clientColor = 0xFF0000FF; // переключаем на синий
+            clientColor = 0xFF0000FF;
         } else {
-            clientColor = 0xFFFF0000; // возвращаем красный
+            clientColor = 0xFFFF0000;
         }
     }
 }
