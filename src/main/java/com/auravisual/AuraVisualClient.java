@@ -31,7 +31,7 @@ public class AuraVisualClient implements ClientModInitializer {
             }
         });
 
-        // ОСНОВНОЙ ХОД РЕНДЕРИНГА ИНТЕРФЕЙСА (HUD)
+        // ОСНОВНОЙ ХОД РЕНДЕРИНГА ИНТЕРФЕЙСА И ЧАСТИЦ (HUD)
         HudRenderCallback.EVENT.register((drawContext, renderTickCounter) -> {
             net.minecraft.client.MinecraftClient client = net.minecraft.client.MinecraftClient.getInstance();
             if (client.player == null || client.options.hudHidden) return;
@@ -78,7 +78,7 @@ public class AuraVisualClient implements ClientModInitializer {
                         drawContext.fill(tx, ty, tx + 160, ty + 45, 0xF50D0D0D);
                         drawContext.fill(tx, ty, tx + 2, ty + 45, FeatureManager.clientColor);
 
-                        // Вызов drawEntity с 10 аргументами под Майнкрафт 1.21.4
+                        // Вызов drawEntity под Майнкрафт 1.21.4
                         int entityX = tx + 22;
                         int entityY = ty + 38;
                         int size = 16;
@@ -104,7 +104,7 @@ public class AuraVisualClient implements ClientModInitializer {
                     }
 
                     // РЕЖИМ 3: МИКРО / МИНИМАЛИЗМ (Прямо под прицелом)
-                    else if (FeatureManager.targetHUD && FeatureManager.targetHudMode == 3) {
+                    else if (FeatureManager.targetHudMode == 3) {
                         int tx = screenWidth / 2 - 25;
                         int ty = screenHeight / 2 + 15;
 
@@ -136,7 +136,6 @@ public class AuraVisualClient implements ClientModInitializer {
                 for (int i = 3; i >= 0; i--) {
                     net.minecraft.item.ItemStack armorItem = client.player.getInventory().getArmorStack(i);
                     if (!armorItem.isEmpty()) {
-                        // В 1.21.4 этот метод рисует предмет И его внутренние индикаторы (прочность) сразу
                         drawContext.drawItem(armorItem, ax, ay);
                         
                         if (armorItem.isDamageable()) {
@@ -175,6 +174,55 @@ public class AuraVisualClient implements ClientModInitializer {
                     drawContext.drawText(tr, timeText, px + 55, py + 3, 0x80FFFFFF, false);
 
                     py += 16;
+                }
+            }
+
+            // --- Категория: ВИЗУАЛ И МИР (Glow ESP для лута) ---
+            if (client.world != null) {
+                if (FeatureManager.glowESP) {
+                    for (net.minecraft.entity.Entity entity : client.world.getEntities()) {
+                        if (entity instanceof net.minecraft.entity.ItemEntity) {
+                            entity.setGlowing(true);
+                        }
+                    }
+                } else {
+                    // Гасим свечение предметов, если модуль выключили
+                    for (net.minecraft.entity.Entity entity : client.world.getEntities()) {
+                        if (entity instanceof net.minecraft.entity.ItemEntity && entity.isGlowing()) {
+                            entity.setGlowing(false);
+                        }
+                    }
+                }
+            }
+
+            // --- Категория: ВИЗУАЛ И МИР (Движущиеся призраки вокруг цели) ---
+            if (FeatureManager.customParticles && client.world != null) {
+                PlayerEntity particleTarget = TargetScanner.getTargetPlayer(30.0);
+
+                if (particleTarget != null) {
+                    long time = client.world.getTime();
+                    
+                    double entityX = particleTarget.getX();
+                    double entityY = particleTarget.getY();
+                    double entityZ = particleTarget.getZ();
+
+                    // Спавним 3 призрачных орба, летящих по спирали вверх
+                    for (int j = 0; j < 3; j++) {
+                        double angle = (time * 0.2) + (j * 2.0);
+                        double radius = 0.8;
+
+                        double offsetX = Math.sin(angle) * radius;
+                        double offsetZ = Math.cos(angle) * radius;
+                        double offsetY = 0.2 + ((time + j * 10) % 40) * 0.04;
+
+                        client.world.addParticle(
+                            net.minecraft.particle.ParticleTypes.WITCH, 
+                            entityX + offsetX, 
+                            entityY + offsetY, 
+                            entityZ + offsetZ, 
+                            0, 0, 0
+                        );
+                    }
                 }
             }
         });
