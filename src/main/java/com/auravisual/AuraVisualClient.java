@@ -104,7 +104,7 @@ public class AuraVisualClient implements ClientModInitializer {
                     }
 
                     // РЕЖИМ 3: МИКРО / МИНИМАЛИЗМ (Прямо под прицелом)
-                    else if (FeatureManager.targetHudMode == 3) {
+                    else if (FeatureManager.targetHUD && FeatureManager.targetHudMode == 3) {
                         int tx = screenWidth / 2 - 25;
                         int ty = screenHeight / 2 + 15;
 
@@ -136,8 +136,8 @@ public class AuraVisualClient implements ClientModInitializer {
                 for (int i = 3; i >= 0; i--) {
                     net.minecraft.item.ItemStack armorItem = client.player.getInventory().getArmorStack(i);
                     if (!armorItem.isEmpty()) {
+                        // В 1.21.4 этот метод рисует предмет И его внутренние индикаторы (прочность) сразу
                         drawContext.drawItem(armorItem, ax, ay);
-                        drawContext.drawItemInSlot(tr, armorItem, ax, ay);
                         
                         if (armorItem.isDamageable()) {
                             int maxDamage = armorItem.getMaxDamage();
