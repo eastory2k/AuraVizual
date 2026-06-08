@@ -98,4 +98,35 @@ public class AuraVisualClient implements ClientModInitializer {
                         drawContext.drawText(tr, "HP: " + (int)hp + " / " + (int)maxHp, tx + 42, ty + 20, 0x80FFFFFF, false);
 
                         // Нижний индикатор здоровья под моделью
-                        drawContext.fill(tx + 42
+                        drawContext.fill(tx + 42, ty + 32, tx + 150, ty + 35, 0x20FFFFFF);
+                        int barWidth2 = (int) (108 * hpPercent);
+                        drawContext.fill(tx + 42, ty + 32, tx + 42 + barWidth2, ty + 35, FeatureManager.clientColor);
+                    }
+
+                    // РЕЖИМ 3: МИКРО / МИНИМАЛИЗМ (Прямо под прицелом)
+                    else if (FeatureManager.targetHudMode == 3) {
+                        int tx = screenWidth / 2 - 25;
+                        int ty = screenHeight / 2 + 15;
+
+                        drawContext.fill(tx, ty, tx + 50, ty + 12, 0xCC111111);
+                        int barWidth3 = (int) (50 * hpPercent);
+                        drawContext.fill(tx, ty + 10, tx + barWidth3, ty + 12, FeatureManager.clientColor);
+                        
+                        String miniText = (int)hp + " HP";
+                        int textX = tx + (50 - tr.getWidth(miniText)) / 2;
+                        drawContext.drawText(tr, miniText, textX, ty + 1, 0xFFFFFFFF, false);
+                    }
+                }
+            }
+
+            // --- ОТРИСОВКА ПЛАШКИ ITEMSWAP ---
+            if (FeatureManager.itemSwapVisual) {
+                int x = 10;
+                int y = 50;
+                drawContext.fill(x, y, x + 100, y + 20, 0xC0101010);
+                drawContext.fill(x, y, x + 2, y + 20, FeatureManager.clientColor);
+                drawContext.drawText(tr, "ItemSwap: Active", x + 8, y + 6, 0xFFFFFFFF, false);
+            }
+        });
+    }
+}
