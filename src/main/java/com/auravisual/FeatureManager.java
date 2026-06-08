@@ -1,18 +1,18 @@
 package com.auravisual;
 
 public class FeatureManager {
-    public static int clientColor = 0xFF8800FF; // Стандартный фиолетовый
+    public static int clientColor = 0xFFB266FF; // Фиолетовый по умолчанию
+    
+    // Состояния модулей
+    public static boolean targetHUD = false;
     public static int targetHudMode = 1;
-    
-    // Модули
-    public static boolean targetHUD = true;
-    public static boolean armorHUD = true;
-    public static boolean potionHUD = true;
+    public static boolean armorHUD = false;
+    public static boolean potionHUD = false;
     public static boolean glowESP = false;
-    public static boolean customParticles = true;
-    public static boolean itemSwapVisual = true;
+    public static boolean customParticles = false;
+    public static boolean itemSwapVisual = false;
     
-    // НОВАЯ ПЕРЕМЕННАЯ
+    // НАША НОВАЯ ПЕРЕМЕННАЯ
     public static boolean soulSight = false; 
 
     // Косметика
@@ -20,17 +20,19 @@ public class FeatureManager {
     public static boolean showHat = false;
     public static boolean showDemonicRays = false;
 
+    // Метод для смены цвета (Color Picker)
     public static void toggleColor() {
-        if (clientColor == 0xFF8800FF) clientColor = 0xFFFF0000;      // Красный
-        else if (clientColor == 0xFFFF0000) clientColor = 0xFF00FF00; // Зеленый
-        else if (clientColor == 0xFF00FF00) clientColor = 0xFF00FFFF; // Голубой
-        else clientColor = 0xFF8800FF;                               // Назад в фиолетовый
+        if (clientColor == 0xFFB266FF) clientColor = 0xFFFF3333; // В красный
+        else if (clientColor == 0xFFFF3333) clientColor = 0xFF33FF33; // В зеленый
+        else if (clientColor == 0xFF33FF33) clientColor = 0xFF33CCFF; // В голубой
+        else clientColor = 0xFFB266FF; // Назад в фиолетовый
     }
 
     public static String getColorName() {
-        if (clientColor == 0xFFFF0000) return "Красный";
-        if (clientColor == 0xFF00FF00) return "Зеленый";
-        if (clientColor == 0xFF00FFFF) return "Голубой";
-        return "Фиолетовый";
+        if (clientColor == 0xFFB266FF) return "Фиолетовый";
+        if (clientColor == 0xFFFF3333) return "Красный";
+        if (clientColor == 0xFF33FF33) return "Зеленый";
+        if (clientColor == 0xFF33CCFF) return "Голубой";
+        return "Неизвестно";
     }
 }
