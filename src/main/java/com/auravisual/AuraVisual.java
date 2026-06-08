@@ -12,6 +12,7 @@ public class AuraVisual implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        // Регистрация клавиши Правый Shift
         openGuiKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.auravisual.open", 
                 InputUtil.Type.KEYSYM, 
@@ -19,10 +20,13 @@ public class AuraVisual implements ClientModInitializer {
                 "category.auravisual"
         ));
 
+        // Отслеживание нажатия каждый игровой тик
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player != null && client.world != null) {
-                if (openGuiKey.wasPressed() && client.currentScreen == null) {
-                    client.setScreen(new ClickGUI());
+                while (openGuiKey.wasPressed()) {
+                    if (client.currentScreen == null) {
+                        client.setScreen(new ClickGUI());
+                    }
                 }
             }
         });
