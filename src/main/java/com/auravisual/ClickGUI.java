@@ -85,7 +85,7 @@ public class ClickGUI extends Screen {
         String status = active ? "• ON" : "• OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x50FFFFFF;
         
-        ctx.drawText(this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
+        ctx.drawText(ctx.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
     }
 
     private void drawColorBtn(DrawContext ctx, int bx, int by, int bWidth, String name, int mx, int my) {
