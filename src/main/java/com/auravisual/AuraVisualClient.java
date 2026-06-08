@@ -6,27 +6,24 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 
-public class AuraVisualEngine {
+public class AuraVisualClient {
 
+    // Этот метод должен вызываться из твоего Mixin или обработчика событий каждый тик
     public static void onClientTick(MinecraftClient mc) {
         if (mc.player == null || mc.world == null) return;
 
-        // ПРОВЕРКА 1: Работает быстрый TriggerBot
+        // Все функции теперь проверяются независимо (работают одновременно)
         if (FeatureManager.triggerBot) {
             runFastTriggerBot(mc);
         }
 
-        // ПРОВЕРКА 2: Параллельно работает TargetHUD
         if (FeatureManager.targetHUD) {
-            // Твоя логика отрисовки TargetHUD
+            // Логика TargetHUD
         }
 
-        // ПРОВЕРКА 3: Параллельно работает ArmorHUD
-        if (FeatureManager.armorHUD) {
-            // Твоя логика отрисовки ArmorHUD
+        if (FeatureManager.glowESP) {
+            // Логика ESP
         }
-        
-        // Добавь сюда остальные if (FeatureManager.ХХХ) для остальных функций...
     }
 
     private static void runFastTriggerBot(MinecraftClient mc) {
@@ -35,11 +32,8 @@ public class AuraVisualEngine {
             EntityHitResult entityHitResult = (EntityHitResult) hitResult;
             Entity target = entityHitResult.getEntity();
 
-            // Проверяем, что цель жива и это не сам игрок
             if (target != null && target.isAlive() && target != mc.player) {
-                
-                // РАЗГОН: Убрали условие getAttackCooldownProgress >= 1.0f!
-                // Бьем сразу же, как только прицел наведен на сущность!
+                // Мгновенная атака без задержки (ускоренный TriggerBot)
                 if (mc.interactionManager != null) {
                     mc.interactionManager.attackEntity(mc.player, target);
                     mc.player.swingHand(Hand.MAIN_HAND);
