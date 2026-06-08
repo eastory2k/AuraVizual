@@ -46,7 +46,9 @@ public class AuraVisualClient implements ClientModInitializer {
                     
                     // Базовая скорость маха (0.15 когда стоим) + ускорение от бега/полета
                     double wingSpeed = 0.15 + (velocity * 1.8);
-                    if (client.player.isFallFlying()) wingSpeed = 0.8; // Если летит на элитрах — машет на максимум
+                    
+                    // ИСПРАВЛЕНО: Вместо isFallFlying() используем isGliding() для Fabric 1.21.4
+                    if (client.player.isGliding()) wingSpeed = 0.8; 
                     
                     wingTimer += wingSpeed;
                     double wingWave = Math.sin(wingTimer) * 0.45; // Амплитуда взмаха
