@@ -12,86 +12,143 @@ public class ClickGUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        // 1. Рисуем красивый задний полупрозрачный фон на весь экран (затемнение игры)
         this.renderBackground(context, mouseX, mouseY, delta);
 
-        // Размеры главного окна меню
-        int width = 200;
-        int height = 180;
+        // Сделаем окно чуть шире, так как функций стало много
+        int width = 240;
+        int height = 240;
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
-        // 2. Главная панель меню (Тёмный современный минимализм)
-        context.fill(x, y, x + width, y + height, 0xED151515); // Основной фон (почти черный)
-        context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); // Фирменная неоновая полоска сверху
+        // Главный фон
+        context.fill(x, y, x + width, y + height, 0xED121212); 
+        context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
-        // 3. Заголовок меню
-        context.drawText(this.textRenderer, "AURA VISUAL", x + 10, y + 10, FeatureManager.clientColor, false);
-        context.drawText(this.textRenderer, "v1.0.0", x + width - 40, y + 10, 0x60FFFFFF, false); // Серый текст версии
+        // Заголовок
+        context.drawText(this.textRenderer, "AURA VISUAL // CONFIG", x + 12, y + 10, FeatureManager.clientColor, false);
+        context.drawText(this.textRenderer, "v1.0.0", x + width - 45, y + 10, 0x50FFFFFF, false);
 
-        // Разделительная линия
-        context.fill(x + 10, y + 24, x + width - 10, y + 25, 0x20FFFFFF);
+        context.fill(x + 10, y + 24, x + width - 10, y + 25, 0x15FFFFFF);
 
-        // 4. Отрисовка интерактивных кнопок-модулей
-        int buttonY = y + 35;
+        // Начальная координата для отрисовки кнопок
+        int bx = x + 12;
+        int bWidth = width - 24;
+        int startY = y + 32;
+        int stepY = 22; // Расстояние между кнопками
 
-        // Кнопка 1: ItemSwap
-        drawModuleButton(context, x + 10, buttonY, width - 20, "ItemSwap Animation", FeatureManager.itemSwapVisual, mouseX, mouseY);
+        // 1. TargetHUD с выбором режимов
+        String thModeName = "Классика";
+        if (FeatureManager.targetHudMode == 2) thModeName = "3D Модель";
+        if (FeatureManager.targetHudMode == 3) thModeName = "Микро";
+        String thText = "TargetHUD [" + thModeName + "]";
+        drawBtn(context, bx, startY, bWidth, thText, FeatureManager.targetHUD, mouseX, mouseY);
+
+        // 2. Инфо-панели
+        drawBtn(context, bx, startY + stepY, bWidth, "ArmorHUD (Броня и Сферы)", FeatureManager.armorHUD, mouseX, mouseY);
+        drawBtn(context, bx, startY + stepY * 2, bWidth, "PotionHUD (Эффекты)", FeatureManager.potionHUD, mouseX, mouseY);
+        drawBtn(context, bx, startY + stepY * 3, bWidth, "KeyStrokes (Клавиши)", FeatureManager.keyStrokes, mouseX, mouseY);
+
+        // 3. Визуал и Мир
+        drawBtn(context, bx, startY + stepY * 4, bWidth, "Glow / ESP (Подсветка Лута)", FeatureManager.glowESP, mouseX, mouseY);
+        drawBtn(context, bx, startY + stepY * 5, bWidth, "Custom Particles (Криты)", FeatureManager.customParticles, mouseX, mouseY);
+        drawBtn(context, bx, startY + stepY * 6, bWidth, "StaffAlert (Админ-Чекалка)", FeatureManager.staffAlert, mouseX, mouseY);
         
-        // Кнопка 2: TargetHUD
-        drawModuleButton(context, x + 10, buttonY + 30, width - 20, "Target HUD", FeatureManager.targetHUD, mouseX, mouseY);
-
-        // Кнопка 3: DynamicIsland
-        drawModuleButton(context, x + 10, buttonY + 60, width - 20, "Dynamic Island", FeatureManager.dynamicIsland, mouseX, mouseY);
+        // 4. Базовые
+        drawBtn(context, bx, startY + stepY * 7, bWidth, "ItemSwap Visual", FeatureManager.itemSwapVisual, mouseX, mouseY);
+        drawBtn(context, bx, startY + stepY * 8, bWidth, "Dynamic Island", FeatureManager.dynamicIsland, mouseX, mouseY);
 
         super.render(context, mouseX, mouseY, delta);
     }
 
-    // Вспомогательный метод для рисования стильных кнопок
-    private void drawModuleButton(DrawContext context, int bx, int by, int bWidth, String name, boolean enabled, int mouseX, int mouseY) {
-        // Проверяем, наведена ли мышка на кнопку (Hover эффект)
-        boolean hovered = mouseX >= bx && mouseX <= bx + bWidth && mouseY >= by && mouseY <= by + 22;
+    private void drawBtn(DrawContext ctx, int bx, int by, int bWidth, String name, boolean active, int mx, int my) {
+        boolean hovered = mx >= bx && mx <= bx + bWidth && my >= by && my <= by + 18;
+        int bgColor = hovered ? 0x25FFFFFF : 0x10FFFFFF;
         
-        // Цвет фона кнопки (становится чуть светлее при наведении)
-        int backgroundColor = hovered ? 0x35FFFFFF : 0x15FFFFFF;
-        context.fill(bx, by, bx + bWidth, by + 22, backgroundColor);
-
-        // Текст модуля
-        context.drawText(this.textRenderer, name, bx + 8, by + 7, 0xFFFFFFFF, false);
-
-        // Индикатор состояния (Вкл/Выкл) в стиле чекбокса
-        String stateText = enabled ? "ENABLED" : "DISABLED";
-        int stateColor = enabled ? FeatureManager.clientColor : 0x50FFFFFF;
-        context.drawText(this.textRenderer, stateText, bx + bWidth - 60, by + 7, stateColor, false);
+        // Рисуем задний план кнопки
+        ctx.fill(bx, by, bx + bWidth, by + 18, bgColor);
+        
+        // Текст названия кнопки
+        ctx.drawText(this.textRenderer, name, bx + 6, by + 5, 0xFFE0E0E0, false);
+        
+        // Текст статуса
+        String status = active ? "• ON" : "• OFF";
+        int statusColor = active ? FeatureManager.clientColor : 0x40FFFFFF;
+        ctx.drawText(this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int width = 200;
+        int width = 240;
         int x = (this.width - width) / 2;
-        int y = (this.height - 180) / 2;
-        int buttonY = y + 35;
+        int y = (this.height - 240) / 2;
+        
+        int bx = x + 12;
+        int bWidth = width - 24;
+        int startY = y + 32;
+        int stepY = 22;
 
-        // Обработка кликов по кнопкам (переключение true/false)
-        if (mouseX >= x + 10 && mouseX <= x + width - 10) {
-            if (mouseY >= buttonY && mouseY <= buttonY + 22) {
+        if (mouseX >= bx && mouseX <= bx + bWidth) {
+            // Клик по TargetHUD
+            if (mouseY >= startY && mouseY <= startY + 18) {
+                if (!FeatureManager.targetHUD) {
+                    FeatureManager.targetHUD = true;
+                    FeatureManager.targetHudMode = 1;
+                } else if (FeatureManager.targetHudMode == 1) {
+                    FeatureManager.targetHudMode = 2;
+                } else if (FeatureManager.targetHudMode == 2) {
+                    FeatureManager.targetHudMode = 3;
+                } else {
+                    FeatureManager.targetHUD = false;
+                }
+                return true;
+            }
+            // ArmorHUD
+            if (mouseY >= startY + stepY && mouseY <= startY + stepY + 18) {
+                FeatureManager.armorHUD = !FeatureManager.armorHUD;
+                return true;
+            }
+            // PotionHUD
+            if (mouseY >= startY + stepY * 2 && mouseY <= startY + stepY * 2 + 18) {
+                FeatureManager.potionHUD = !FeatureManager.potionHUD;
+                return true;
+            }
+            // KeyStrokes
+            if (mouseY >= startY + stepY * 3 && mouseY <= startY + stepY * 3 + 18) {
+                FeatureManager.keyStrokes = !FeatureManager.keyStrokes;
+                return true;
+            }
+            // GlowESP
+            if (mouseY >= startY + stepY * 4 && mouseY <= startY + stepY * 4 + 18) {
+                FeatureManager.glowESP = !FeatureManager.glowESP;
+                return true;
+            }
+            // CustomParticles
+            if (mouseY >= startY + stepY * 5 && mouseY <= startY + stepY * 5 + 18) {
+                FeatureManager.customParticles = !FeatureManager.customParticles;
+                return true;
+            }
+            // StaffAlert
+            if (mouseY >= startY + stepY * 6 && mouseY <= startY + stepY * 6 + 18) {
+                FeatureManager.staffAlert = !FeatureManager.staffAlert;
+                return true;
+            }
+            // ItemSwap
+            if (mouseY >= startY + stepY * 7 && mouseY <= startY + stepY * 7 + 18) {
                 FeatureManager.itemSwapVisual = !FeatureManager.itemSwapVisual;
                 return true;
             }
-            if (mouseY >= buttonY + 30 && mouseY <= buttonY + 32 + 22) {
-                FeatureManager.targetHUD = !FeatureManager.targetHUD;
-                return true;
-            }
-            if (mouseY >= buttonY + 60 && mouseY <= buttonY + 62 + 22) {
+            // Dynamic Island
+            if (mouseY >= startY + stepY * 8 && mouseY <= startY + stepY * 8 + 18) {
                 FeatureManager.dynamicIsland = !FeatureManager.dynamicIsland;
                 return true;
             }
         }
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean shouldPause() {
-return false; // Чтобы игра не вставала на паузу в сетевом режиме при открытии меню
+        return false;
     }
 }
