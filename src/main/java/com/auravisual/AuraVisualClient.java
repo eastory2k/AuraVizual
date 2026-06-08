@@ -127,6 +127,56 @@ public class AuraVisualClient implements ClientModInitializer {
                 drawContext.fill(x, y, x + 2, y + 20, FeatureManager.clientColor);
                 drawContext.drawText(tr, "ItemSwap: Active", x + 8, y + 6, 0xFFFFFFFF, false);
             }
+
+            // --- Категория: ИНФО-ПАНЕЛИ (ArmorHUD) ---
+            if (FeatureManager.armorHUD) {
+                int ax = screenWidth / 2 + 15;
+                int ay = screenHeight - 55;
+
+                for (int i = 3; i >= 0; i--) {
+                    net.minecraft.item.ItemStack armorItem = client.player.getInventory().getArmorStack(i);
+                    if (!armorItem.isEmpty()) {
+                        drawContext.drawItem(armorItem, ax, ay);
+                        drawContext.drawItemInSlot(tr, armorItem, ax, ay);
+                        
+                        if (armorItem.isDamageable()) {
+                            int maxDamage = armorItem.getMaxDamage();
+                            int currentDamage = maxDamage - armorItem.getDamage();
+                            int percent = (currentDamage * 100) / maxDamage;
+                            
+                            int durabilityColor = percent > 50 ? 0xFF00FF00 : (percent > 20 ? 0xFFFFD700 : 0xFFFF0000);
+                            drawContext.drawText(tr, percent + "%", ax + 18, ay + 4, durabilityColor, true);
+                        } else {
+                            drawContext.drawText(tr, "100%", ax + 18, ay + 4, 0xFFFFFFFF, true);
+                        }
+                        ay += 16;
+                    }
+                }
+            }
+
+            // --- Категория: ИНФО-ПАНЕЛИ (PotionHUD) ---
+            if (FeatureManager.potionHUD) {
+                int px = screenWidth - 100;
+                int py = 10;
+
+                for (net.minecraft.entity.effect.StatusEffectInstance effect : client.player.getStatusEffects()) {
+                    String effectName = effect.getEffectType().value().getName().getString();
+                    int durationTicks = effect.getDuration();
+                    
+                    int totalSeconds = durationTicks / 20;
+                    int minutes = totalSeconds / 60;
+                    int seconds = totalSeconds % 60;
+                    String timeText = String.format("%d:%02d", minutes, seconds);
+
+                    drawContext.fill(px, py, px + 90, py + 14, 0x90151515);
+                    drawContext.fill(px + 88, py, px + 90, py + 14, FeatureManager.clientColor);
+
+                    drawContext.drawText(tr, effectName, px + 5, py + 3, 0xFFFFFFFF, false);
+                    drawContext.drawText(tr, timeText, px + 55, py + 3, 0x80FFFFFF, false);
+
+                    py += 16;
+                }
+            }
         });
     }
 }
