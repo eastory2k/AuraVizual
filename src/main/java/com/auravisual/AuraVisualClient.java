@@ -16,27 +16,17 @@ public class AuraVisualClient {
     private static long currentDelay = 0L;
     private static final Random random = new Random();
 
-    // Настройки AimAssist (Ассистента наводки)
+    // Настройки ассиста
     private static final double ASSIST_RANGE = 4.5; 
-    private static final float ASSIST_SPEED = 3.5f; // Скорость доводки (чем выше, тем резче)
+    private static final float ASSIST_SPEED = 3.5f; 
 
     public static void onClientTick(MinecraftClient mc) {
         if (mc.player == null || mc.world == null) return;
 
-        // 1. Работает плавный ассистент наводки (работает всегда, когда включен триггер или зажата атака)
+        // Если функция включена в FeatureManager
         if (FeatureManager.triggerBot) {
             runAimAssist(mc);
             runSmartTriggerBot(mc);
-        }
-
-        // 2. Визуалы (TargetHUD)
-        if (FeatureManager.targetHUD) {
-            // Твоя логика TargetHUD
-        }
-
-        // 3. Визуалы (ESP)
-        if (FeatureManager.glowESP) {
-            // Твоя логика ESP
         }
     }
 
@@ -49,10 +39,9 @@ public class AuraVisualClient {
 
             if (target instanceof LivingEntity && target.isAlive() && target != mc.player) {
                 long currentTime = System.currentTimeMillis();
-                
                 if (currentTime - lastAttackTime < currentDelay) return;
 
-                // Условия для 100% Крита на 1.21.4
+                // Условие для крита: игрок в воздухе и падает
                 boolean isCritPhase = !mc.player.isOnGround() 
                         && mc.player.fallDistance > 0.0F 
                         && !mc.player.isClimbing() 
@@ -62,10 +51,8 @@ public class AuraVisualClient {
                     if (mc.interactionManager != null) {
                         mc.interactionManager.attackEntity(mc.player, target);
                         mc.player.swingHand(Hand.MAIN_HAND);
-                        
                         lastAttackTime = currentTime;
-                        // Обход автокликера PolarAC/SlothAC: плавающий CPS от 7.5 до 10
-                        currentDelay = 100 + random.nextInt(45); 
+                        currentDelay = 100 + random.nextInt(50); // Рандомная задержка для обхода античитов
                     }
                 }
             }
@@ -76,7 +63,6 @@ public class AuraVisualClient {
         LivingEntity closestTarget = null;
         double closestDist = ASSIST_RANGE;
 
-        // Поиск ближайшей живой цели
         for (Entity entity : mc.world.getEntities()) {
             if (entity instanceof LivingEntity && entity.isAlive() && entity != mc.player) {
                 double dist = mc.player.distanceTo(entity);
@@ -87,7 +73,6 @@ public class AuraVisualClient {
             }
         }
 
-        // Если цель найдена — плавно поворачиваем камеру к её хитбоксу
         if (closestTarget != null) {
             Vec3d targetPos = closestTarget.getEyePos();
             Vec3d playerPos = mc.player.getEyePos();
@@ -100,7 +85,7 @@ public class AuraVisualClient {
             float targetYaw = (float) (MathHelper.atan2(diffZ, diffX) * 180.0 / MathHelper.PI) - 90.0f;
             float targetPitch = (float) (-(MathHelper.atan2(diffY, diffXZ) * 180.0 / MathHelper.PI));
 
-            // Плавная интерполяция углов (обходит проверку античитов на резкие ротации "SmoothRotation")
+            // Плавная доводка
             mc.player.setYaw(mc.player.getYaw() + MathHelper.wrapDegrees(targetYaw - mc.player.getYaw()) / ASSIST_SPEED);
             mc.player.setPitch(mc.player.getPitch() + MathHelper.wrapDegrees(targetPitch - mc.player.getPitch()) / ASSIST_SPEED);
         }
