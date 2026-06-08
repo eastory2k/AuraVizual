@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "auravisual",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "AuraVisual",
   "description": "Modern HUD and Combat utility mod",
   "authors": ["Swill Way"],
