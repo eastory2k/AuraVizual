@@ -9,9 +9,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
-    @Inject(at = @At("END"), method = "tick")
+    @Inject(at = @At("HEAD"), method = "tick")
     private void onTick(CallbackInfo info) {
-        // Вызываем нашу логику чита каждый игровой тик
-        AuraVisualClient.onClientTick(MinecraftClient.getInstance());
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player != null && mc.world != null) {
+            AuraVisualClient.onClientTick(mc);
+        }
     }
 }
