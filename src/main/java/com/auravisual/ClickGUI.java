@@ -17,12 +17,12 @@ public class ClickGUI extends Screen {
         this.renderBackground(context, mouseX, mouseY, delta);
 
         int width = 240;
-        int height = 230;
+        int height = 180; // Уменьшили высоту окна, так как текст убран
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
-        // Основной темный фон меню
-        context.fill(x, y, x + width, y + height, 0xFA0F0F0F); 
+        // Основной плотный фон меню
+        context.fill(x, y, x + width, y + height, 0xF60F0F0F); 
         context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
         // Шапка меню
@@ -53,16 +53,10 @@ public class ClickGUI extends Screen {
         int startY = y + 52;
         int stepY = 22;
 
-        // ОТРИСОВКА В ВКЛАДКАХ
+        // Отрендеренные элементы
         if (currentTab == 0) {
-            // Рисуем кнопку TriggerBot (теперь она будет серой и заметной)
+            // Только кнопка TriggerBot, никакого лишнего текста и размытых блоков снизу!
             drawBtn(context, bx, startY, bWidth, "TriggerBot (Только Криты)", FeatureManager.triggerBot, mouseX, mouseY);
-            
-            // Сдвигаем текстовое описание в самый-самый низ окна (на y + 150), чтобы оно не мешало кликам
-            int infoY = y + 160;
-            context.fill(x + 10, infoY, x + width - 10, infoY + 1, 0x15FFFFFF); // линия над описанием
-            context.drawText(this.textRenderer, "TriggerBot автоматически бьет игрока,", x + 14, infoY + 10, 0x50FFFFFF, false);
-            context.drawText(this.textRenderer, "когда он находится в вашем прицеле.", x + 14, infoY + 22, 0x50FFFFFF, false);
         }
         else if (currentTab == 1) {
             String thModeName = "Классика";
@@ -90,8 +84,7 @@ public class ClickGUI extends Screen {
 
     private void drawBtn(DrawContext ctx, int bx, int by, int bWidth, String name, boolean active, int mx, int my) {
         boolean hovered = mx >= bx && mx <= bx + bWidth && my >= by && my <= by + 18;
-        // ИСПРАВЛЕНО: Сделали видимый цвет подложки кнопок (0x1F222222), чтобы они не сливались с фоном
-        int bgColor = hovered ? 0x30FFFFFF : 0x1F222222; 
+        int bgColor = hovered ? 0x25FFFFFF : 0x12FFFFFF; 
         
         ctx.fill(bx, by, bx + bWidth, by + 18, bgColor);
         ctx.drawText(this.textRenderer, name, bx + 6, by + 5, 0xFFE0E0E0, false);
@@ -103,17 +96,18 @@ public class ClickGUI extends Screen {
 
     private void drawColorBtn(DrawContext ctx, int bx, int by, int bWidth, String name, int mx, int my) {
         boolean hovered = mx >= bx && mx <= bx + bWidth && my >= by && my <= by + 18;
-        int bgColor = hovered ? 0x35FFFFFF : 0x1F222222;
+        int bgColor = hovered ? 0x35FFFFFF : 0x12FFFFFF;
         ctx.fill(bx, by, bx + bWidth, by + 18, bgColor);
         ctx.fill(bx, by, bx + 3, by + 18, FeatureManager.clientColor);
         ctx.drawText(this.textRenderer, name, bx + 10, by + 5, 0xFFFFFFFF, false);
+        ctx.drawText(this.textMainWindow - 65, by + 5, FeatureManager.clientColor, false);
         ctx.drawText(this.textRenderer, "[ СМЕНИТЬ ]", bx + bWidth - 65, by + 5, FeatureManager.clientColor, false);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int width = 240;
-        int height = 230;
+        int height = 180;
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
         
@@ -132,7 +126,6 @@ public class ClickGUI extends Screen {
         // Клик по кнопкам внутри вкладок
         if (mouseX >= bx && mouseX <= bx + bWidth) {
             if (currentTab == 0) {
-                // Точная область клика по верхней кнопке TriggerBot
                 if (mouseY >= startY && mouseY <= startY + 18) { 
                     FeatureManager.triggerBot = !FeatureManager.triggerBot; 
                     return true; 
