@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 public class ClickGUI extends Screen {
-    // ТЕПЕРЬ У НАС ТРИ ВКЛАДКИ: 0 - БОЙ, 1 - ВИЗУАЛЫ, 2 - КОСМЕТИКА
+    // Вкладки: 0 - БОЙ, 1 - ВИЗУАЛЫ, 2 - КОСМЕТИКА
     private int currentTab = 0; 
 
     public ClickGUI() {
@@ -21,28 +21,31 @@ public class ClickGUI extends Screen {
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
+        // Фон меню
         context.fill(x, y, x + width, y + height, 0xED121212); 
         context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
+        // Шапка
         context.drawText(this.textRenderer, "AURA VISUAL // MENU", x + 12, y + 10, FeatureManager.clientColor, false);
         context.drawText(this.textRenderer, "v1.0.0", x + width - 45, y + 10, 0x50FFFFFF, false);
 
         int tabY = y + 24;
         
-        // Хитбоксы для трех вкладок сверху
-        boolean hoverTab0 = mouseX >= x + 12 && mouseX <= x + 75 && mouseY >= tabY && mouseY <= tabY + 14;
-        boolean hoverTab1 = mouseX >= x + 80 && mouseX <= x + 155 && mouseY >= tabY && mouseY <= tabY + 14;
-        boolean hoverTab2 = mouseX >= x + 160 && mouseX <= x + 230 && mouseY >= tabY && mouseY <= tabY + 14;
+        // Подсветка вкладок при наведении
+        boolean hoverTab0 = mouseX >= x + 12 && mouseX <= x + 65 && mouseY >= tabY && mouseY <= tabY + 14;
+        boolean hoverTab1 = mouseX >= x + 75 && mouseX <= x + 145 && mouseY >= tabY && mouseY <= tabY + 14;
+        boolean hoverTab2 = mouseX >= x + 155 && mouseX <= x + 230 && mouseY >= tabY && mouseY <= tabY + 14;
 
         int t0Color = currentTab == 0 ? FeatureManager.clientColor : (hoverTab0 ? 0x80FFFFFF : 0x40FFFFFF);
         context.drawText(this.textRenderer, "[ БОЙ ]", x + 12, tabY + 3, t0Color, false);
 
         int t1Color = currentTab == 1 ? FeatureManager.clientColor : (hoverTab1 ? 0x80FFFFFF : 0x40FFFFFF);
-        context.drawText(this.textRenderer, "[ ВИЗУАЛЫ ]", x + 80, tabY + 3, t1Color, false);
+        context.drawText(this.textRenderer, "[ ВИЗУАЛЫ ]", x + 75, tabY + 3, t1Color, false);
 
         int t2Color = currentTab == 2 ? FeatureManager.clientColor : (hoverTab2 ? 0x80FFFFFF : 0x40FFFFFF);
-        context.drawText(this.textRenderer, "[ КОСМЕТИКА ]", x + 160, tabY + 3, t2Color, false);
+        context.drawText(this.textRenderer, "[ КОСМЕТИКА ]", x + 155, tabY + 3, t2Color, false);
 
+        // Разделительная линия
         context.fill(x + 10, y + 42, x + width - 10, y + 43, 0x15FFFFFF);
 
         int bx = x + 12;
@@ -50,33 +53,32 @@ public class ClickGUI extends Screen {
         int startY = y + 50;
         int stepY = 22;
 
-        // ВКЛАДКА 0: БОЙ (COMBAT)
+        // Отрисовка контента в зависимости от вкладки
         if (currentTab == 0) {
+            // Кнопка TriggerBot на самом верху вкладки
             drawBtn(context, bx, startY, bWidth, "TriggerBot (Только Криты)", FeatureManager.triggerBot, mouseX, mouseY);
             
-            int infoY = startY + stepY * 2;
+            // Сдвинули описание в самый низ (на 4 шага вниз), чтобы оно не мешало кликать!
+            int infoY = startY + stepY * 4;
             context.fill(bx, infoY, bx + bWidth, infoY + 35, 0x08FFFFFF);
-            context.drawText(this.textRenderer, "TriggerBot автоматически бьет игрока,", bx + 6, infoY + 6, 0x70FFFFFF, false);
-            context.drawText(this.textRenderer, "когда он находится в вашем прицеле.", bx + 6, infoY + 18, 0x70FFFFFF, false);
+            context.drawText(this.textRenderer, "TriggerBot автоматически бьет игрока,", bx + 6, infoY + 6, 0x50FFFFFF, false);
+            context.drawText(this.textRenderer, "когда он находится в вашем прицеле.", bx + 6, infoY + 18, 0x50FFFFFF, false);
         }
-        // ВКЛАДКА 1: ВИЗУАЛЫ (VISUALS)
         else if (currentTab == 1) {
             String thModeName = "Классика";
             if (FeatureManager.targetHudMode == 2) thModeName = "3D Модель";
             if (FeatureManager.targetHudMode == 3) thModeName = "Микро";
+            
             drawBtn(context, bx, startY, bWidth, "TargetHUD [" + thModeName + "]", FeatureManager.targetHUD, mouseX, mouseY);
             drawBtn(context, bx, startY + stepY, bWidth, "ArmorHUD (Броня)", FeatureManager.armorHUD, mouseX, mouseY);
             drawBtn(context, bx, startY + stepY * 2, bWidth, "PotionHUD (Эффекты)", FeatureManager.potionHUD, mouseX, mouseY);
-            
             drawBtn(context, bx, startY + stepY * 3, bWidth, "Glow / ESP (Предметы)", FeatureManager.glowESP, mouseX, mouseY);
             drawBtn(context, bx, startY + stepY * 4, bWidth, "SoulSight (Игроки)", FeatureManager.soulSight, mouseX, mouseY);
-            
             drawBtn(context, bx, startY + stepY * 5, bWidth, "Custom Particles (Криты)", FeatureManager.customParticles, mouseX, mouseY);
             drawBtn(context, bx, startY + stepY * 6, bWidth, "ItemSwap Visual", FeatureManager.itemSwapVisual, mouseX, mouseY);
             
             drawColorBtn(context, bx, startY + stepY * 8, bWidth, "Цвет Мода: " + FeatureManager.getColorName(), mouseX, mouseY);
         }
-        // ВКЛАДКА 2: КОСМЕТИКА (COSMETICS)
         else if (currentTab == 2) {
             drawBtn(context, bx, startY, bWidth, "Кастомные Крылья", FeatureManager.showWings, mouseX, mouseY);
             drawBtn(context, bx, startY + stepY, bWidth, "Призрачный Нимб", FeatureManager.showHat, mouseX, mouseY);
@@ -91,9 +93,10 @@ public class ClickGUI extends Screen {
         int bgColor = hovered ? 0x25FFFFFF : 0x10FFFFFF;
         ctx.fill(bx, by, bx + bWidth, by + 18, bgColor);
         ctx.drawText(this.textRenderer, name, bx + 6, by + 5, 0xFFE0E0E0, false);
+        
         String status = active ? "• ON" : "• OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x40FFFFFF;
-        ctx.drawText(this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
+        ctx.drawText(this.textRenderer, status, bx + bWidth - 45, by + 5, statusColor, false);
     }
 
     private void drawColorBtn(DrawContext ctx, int bx, int by, int bWidth, String name, int mx, int my) {
@@ -107,29 +110,33 @@ public class ClickGUI extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int x = (this.width - 240) / 2;
-        int y = (this.height - 250) / 2;
+        int width = 240;
+        int height = 250;
+        int x = (this.width - width) / 2;
+        int y = (this.height - height) / 2;
+        
         int bx = x + 12;
-        int bWidth = 240 - 24;
+        int bWidth = width - 24;
         int startY = y + 50;
         int stepY = 22;
 
-        // Переключение между тремя вкладками по клику
+        // Клик по вкладкам (Переключение)
         if (mouseY >= y + 24 && mouseY <= y + 38) {
-            if (mouseX >= x + 12 && mouseX <= x + 75) { currentTab = 0; return true; }
-            if (mouseX >= x + 80 && mouseX <= x + 155) { currentTab = 1; return true; }
-            if (mouseX >= x + 160 && mouseX <= x + 230) { currentTab = 2; return true; }
+            if (mouseX >= x + 12 && mouseX <= x + 65) { currentTab = 0; return true; }
+            if (mouseX >= x + 75 && mouseX <= x + 145) { currentTab = 1; return true; }
+            if (mouseX >= x + 155 && mouseX <= x + 230) { currentTab = 2; return true; }
         }
 
+        // Клик по кнопкам внутри вкладок
         if (mouseX >= bx && mouseX <= bx + bWidth) {
-            // КЛИКИ ВО ВКЛАДКЕ БОЙ
+            // ВКЛАДКА 0: БОЙ
             if (currentTab == 0) {
                 if (mouseY >= startY && mouseY <= startY + 18) { 
                     FeatureManager.triggerBot = !FeatureManager.triggerBot; 
                     return true; 
                 }
             }
-            // КЛИКИ ВО ВКЛАДКЕ ВИЗУАЛЫ
+            // ВКЛАДКА 1: ВИЗУАЛЫ
             else if (currentTab == 1) {
                 if (mouseY >= startY && mouseY <= startY + 18) {
                     if (!FeatureManager.targetHUD) { FeatureManager.targetHUD = true; FeatureManager.targetHudMode = 1; }
@@ -146,7 +153,7 @@ public class ClickGUI extends Screen {
                 if (mouseY >= startY + stepY * 6 && mouseY <= startY + stepY * 6 + 18) { FeatureManager.itemSwapVisual = !FeatureManager.itemSwapVisual; return true; }
                 if (mouseY >= startY + stepY * 8 && mouseY <= startY + stepY * 8 + 18) { FeatureManager.toggleColor(); return true; }
             } 
-            // КЛИКИ ВО ВКЛАДКЕ КОСМЕТИКА
+            // ВКЛАДКА 2: КОСМЕТИКА
             else if (currentTab == 2) {
                 if (mouseY >= startY && mouseY <= startY + 18) { FeatureManager.showWings = !FeatureManager.showWings; return true; }
                 if (mouseY >= startY + stepY && mouseY <= startY + stepY + 18) { FeatureManager.showHat = !FeatureManager.showHat; return true; }
