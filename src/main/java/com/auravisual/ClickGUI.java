@@ -85,7 +85,6 @@ public class ClickGUI extends Screen {
         String status = active ? "• ON" : "• OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x50FFFFFF;
         
-        // ЗДЕСЬ ИСПРАВЛЕНО: заменили ctx.textRenderer на this.textRenderer
         ctx.drawText(this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
     }
 
