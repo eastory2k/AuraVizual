@@ -17,11 +17,11 @@ public class ClickGUI extends Screen {
         this.renderBackground(context, mouseX, mouseY, delta);
 
         int width = 240;
-        int height = 180; // Уменьшили высоту окна, так как текст убран
+        int height = 190; 
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
-        // Основной плотный фон меню
+        // Основной плотный фон меню (непрозрачный, без размытия)
         context.fill(x, y, x + width, y + height, 0xF60F0F0F); 
         context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
@@ -36,13 +36,14 @@ public class ClickGUI extends Screen {
         boolean hoverTab1 = mouseX >= x + 70 && mouseX <= x + 140 && mouseY >= tabY && mouseY <= tabY + 14;
         boolean hoverTab2 = mouseX >= x + 150 && mouseX <= x + 230 && mouseY >= tabY && mouseY <= tabY + 14;
 
-        int t0Color = currentTab == 0 ? FeatureManager.clientColor : (hoverTab0 ? 0xC0FFFFFF : 0x60FFFFFF);
+        // Яркие цвета для вкладок (не размытые)
+        int t0Color = currentTab == 0 ? FeatureManager.clientColor : (hoverTab0 ? 0xFFFFFFFF : 0xBBFFFFFF);
         context.drawText(this.textRenderer, "[БОЙ]", x + 12, tabY, t0Color, false);
 
-        int t1Color = currentTab == 1 ? FeatureManager.clientColor : (hoverTab1 ? 0xC0FFFFFF : 0x60FFFFFF);
+        int t1Color = currentTab == 1 ? FeatureManager.clientColor : (hoverTab1 ? 0xFFFFFFFF : 0xBBFFFFFF);
         context.drawText(this.textRenderer, "[ВИЗУАЛЫ]", x + 70, tabY, t1Color, false);
 
-        int t2Color = currentTab == 2 ? FeatureManager.clientColor : (hoverTab2 ? 0xC0FFFFFF : 0x60FFFFFF);
+        int t2Color = currentTab == 2 ? FeatureManager.clientColor : (hoverTab2 ? 0xFFFFFFFF : 0xBBFFFFFF);
         context.drawText(this.textRenderer, "[КОСМЕТИКА]", x + 150, tabY, t2Color, false);
 
         // Тонкая разделительная линия под вкладками
@@ -53,9 +54,8 @@ public class ClickGUI extends Screen {
         int startY = y + 52;
         int stepY = 22;
 
-        // Отрендеренные элементы
+        // Отрисовка кнопок по вкладкам
         if (currentTab == 0) {
-            // Только кнопка TriggerBot, никакого лишнего текста и размытых блоков снизу!
             drawBtn(context, bx, startY, bWidth, "TriggerBot (Только Криты)", FeatureManager.triggerBot, mouseX, mouseY);
         }
         else if (currentTab == 1) {
@@ -91,7 +91,7 @@ public class ClickGUI extends Screen {
         
         String status = active ? "• ON" : "• OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x50FFFFFF;
-        ctx.drawText(this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
+        ctx.drawText(ctx.drawContext, this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
     }
 
     private void drawColorBtn(DrawContext ctx, int bx, int by, int bWidth, String name, int mx, int my) {
@@ -100,14 +100,13 @@ public class ClickGUI extends Screen {
         ctx.fill(bx, by, bx + bWidth, by + 18, bgColor);
         ctx.fill(bx, by, bx + 3, by + 18, FeatureManager.clientColor);
         ctx.drawText(this.textRenderer, name, bx + 10, by + 5, 0xFFFFFFFF, false);
-        // ИСПРАВЛЕНО: Удалена битая строка с textMainWindow
         ctx.drawText(this.textRenderer, "[ СМЕНИТЬ ]", bx + bWidth - 65, by + 5, FeatureManager.clientColor, false);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int width = 240;
-        int height = 180;
+        int height = 190;
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
         
@@ -123,7 +122,7 @@ public class ClickGUI extends Screen {
             if (mouseX >= x + 150 && mouseX <= x + 230) { currentTab = 2; return true; }
         }
 
-        // Клик по кнопкам внутри вкладок
+        // Клик по кнопкам внутри вкладок (Все проверки независимы!)
         if (mouseX >= bx && mouseX <= bx + bWidth) {
             if (currentTab == 0) {
                 if (mouseY >= startY && mouseY <= startY + 18) { 
@@ -131,7 +130,7 @@ public class ClickGUI extends Screen {
                     return true; 
                 }
             }
-            else if (currentTab == 1) {
+            if (currentTab == 1) {
                 if (mouseY >= startY && mouseY <= startY + 18) {
                     if (!FeatureManager.targetHUD) { FeatureManager.targetHUD = true; FeatureManager.targetHudMode = 1; }
                     else if (FeatureManager.targetHudMode == 1) FeatureManager.targetHudMode = 2;
@@ -147,7 +146,7 @@ public class ClickGUI extends Screen {
                 if (mouseY >= startY + stepY * 6 && mouseY <= startY + stepY * 6 + 18) { FeatureManager.itemSwapVisual = !FeatureManager.itemSwapVisual; return true; }
                 if (mouseY >= startY + stepY * 8 && mouseY <= startY + stepY * 8 + 18) { FeatureManager.toggleColor(); return true; }
             } 
-            else if (currentTab == 2) {
+            if (currentTab == 2) {
                 if (mouseY >= startY && mouseY <= startY + 18) { FeatureManager.showWings = !FeatureManager.showWings; return true; }
                 if (mouseY >= startY + stepY && mouseY <= startY + stepY + 18) { FeatureManager.showHat = !FeatureManager.showHat; return true; }
                 if (mouseY >= startY + stepY * 2 && mouseY <= startY + stepY * 2 + 18) { FeatureManager.showDemonicRays = !FeatureManager.showDemonicRays; return true; }
