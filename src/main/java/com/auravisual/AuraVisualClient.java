@@ -14,20 +14,23 @@ public class AuraVisualClient {
     private static long currentDelay = 0L;
     private static final Random random = new Random();
 
+    // Этот метод вызывается каждый тик из обработчика событий мода
     public static void onClientTick(MinecraftClient mc) {
         if (mc.player == null || mc.world == null) return;
 
-        // Если функция включена в GUI — запускаем умный TriggerBot
+        // ПРОВЕРКА 1: Быстрый обходящий античиты TriggerBot
         if (FeatureManager.triggerBot) {
             runSmartTriggerBot(mc);
         }
 
-        // Параллельно проверяем другие функции (они работают одновременно)
+        // ПРОВЕРКА 2: Параллельно может работать TargetHUD
         if (FeatureManager.targetHUD) {
-            // Твоя логика TargetHUD
+            // Твоя логика рендеринга TargetHUD
         }
+
+        // ПРОВЕРКА 3: Параллельно может работать GlowESP
         if (FeatureManager.glowESP) {
-            // Твоя логика ESP
+            // Твоя логика рендеринга ESP
         }
     }
 
@@ -38,18 +41,18 @@ public class AuraVisualClient {
             EntityHitResult entityHitResult = (EntityHitResult) hitResult;
             Entity target = entityHitResult.getEntity();
 
-            // Проверяем, что цель жива, это живое существо (игрок/моб) и это не сам игрок
+            // Проверяем живую цель
             if (target instanceof LivingEntity && target.isAlive() && target != mc.player) {
                 
                 long currentTime = System.currentTimeMillis();
                 
-                // Если задержка после прошлого удара еще не прошла — пропускаем тик
+                // Проверяем, прошла ли динамическая задержка
                 if (currentTime - lastAttackTime < currentDelay) {
                     return;
                 }
 
-                // КРИТЫ: Проверяем, что игрок летит вниз (не стоит на земле, скорость падения > 0)
-                // Это единственный легальный способ бить критами без флагов на Polar/Sloth
+                // КРИТЫ: Легитная проверка условий падения персонажа.
+                // Не дает флагов, так как полностью использует физику игры.
                 boolean isCritPhase = !mc.player.isOnGround() 
                         && mc.player.fallDistance > 0.0F 
                         && !mc.player.isClimbing() 
@@ -57,16 +60,17 @@ public class AuraVisualClient {
 
                 if (isCritPhase) {
                     if (mc.interactionManager != null) {
-                        // Совершаем атаку
+                        // Наносим удар
                         mc.interactionManager.attackEntity(mc.player, target);
                         mc.player.swingHand(Hand.MAIN_HAND);
                         
-                        // Запоминаем время удара
+                        // Обновляем время атаки
                         lastAttackTime = currentTime;
                         
-                        // РАНДОМИЗАЦИЯ ДЛЯ ОБХОДА: Генерируем случайную задержку до следующего удара.
-                        // Диапазон 110-160 мс дает отличную скорость атаки и симулирует клики человека.
-                        currentDelay = 110 + random.nextInt(50); 
+                        // РАНДОМИЗАЦИЯ ДЛЯ ОБХОДА ПОЛЯРА/СЛОТА:
+                        // Интервал 100-150 мс симулирует отличные клики (~8 CPS) 
+                        // с постоянно меняющимися промежутками. Античит думает, что кликает человек.
+                        currentDelay = 100 + random.nextInt(50); 
                     }
                 }
             }
