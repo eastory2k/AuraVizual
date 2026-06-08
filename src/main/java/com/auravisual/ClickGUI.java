@@ -5,7 +5,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 public class ClickGUI extends Screen {
-    // Вкладки: 0 - БОЙ, 1 - ВИЗУАЛЫ, 2 - КОСМЕТИКА
     private int currentTab = 0; 
 
     public ClickGUI() {
@@ -21,22 +20,18 @@ public class ClickGUI extends Screen {
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
-        // Основной плотный фон меню
         context.fill(x, y, x + width, y + height, 0xF60F0F0F); 
         context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
-        // Шапка меню
         context.drawText(this.textRenderer, "AURA VISUAL // MENU", x + 12, y + 10, FeatureManager.clientColor, false);
         context.drawText(this.textRenderer, "v1.1.0", x + width - 45, y + 10, 0x50FFFFFF, false);
 
         int tabY = y + 26;
         
-        // Области наведения на вкладки
         boolean hoverTab0 = mouseX >= x + 12 && mouseX <= x + 60 && mouseY >= tabY && mouseY <= tabY + 14;
         boolean hoverTab1 = mouseX >= x + 70 && mouseX <= x + 140 && mouseY >= tabY && mouseY <= tabY + 14;
         boolean hoverTab2 = mouseX >= x + 150 && mouseX <= x + 230 && mouseY >= tabY && mouseY <= tabY + 14;
 
-        // Яркие цвета для вкладок (не размытые)
         int t0Color = currentTab == 0 ? FeatureManager.clientColor : (hoverTab0 ? 0xFFFFFFFF : 0xBBFFFFFF);
         context.drawText(this.textRenderer, "[БОЙ]", x + 12, tabY, t0Color, false);
 
@@ -46,7 +41,6 @@ public class ClickGUI extends Screen {
         int t2Color = currentTab == 2 ? FeatureManager.clientColor : (hoverTab2 ? 0xFFFFFFFF : 0xBBFFFFFF);
         context.drawText(this.textRenderer, "[КОСМЕТИКА]", x + 150, tabY, t2Color, false);
 
-        // Тонкая разделительная линия под вкладками
         context.fill(x + 10, y + 42, x + width - 10, y + 43, 0x20FFFFFF);
 
         int bx = x + 12;
@@ -54,7 +48,6 @@ public class ClickGUI extends Screen {
         int startY = y + 52;
         int stepY = 22;
 
-        // Отрисовка кнопок по вкладкам
         if (currentTab == 0) {
             drawBtn(context, bx, startY, bWidth, "TriggerBot (Только Криты)", FeatureManager.triggerBot, mouseX, mouseY);
         }
@@ -92,7 +85,6 @@ public class ClickGUI extends Screen {
         String status = active ? "• ON" : "• OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x50FFFFFF;
         
-        // ИСПРАВЛЕНО: ctx.drawContext удален, теперь компилируется успешно!
         ctx.drawText(this.textRenderer, status, bx + bWidth - 40, by + 5, statusColor, false);
     }
 
@@ -117,14 +109,12 @@ public class ClickGUI extends Screen {
         int startY = y + 52;
         int stepY = 22;
 
-        // Клик по вкладкам
         if (mouseY >= y + 24 && mouseY <= y + 40) {
             if (mouseX >= x + 12 && mouseX <= x + 60) { currentTab = 0; return true; }
             if (mouseX >= x + 70 && mouseX <= x + 140) { currentTab = 1; return true; }
             if (mouseX >= x + 150 && mouseX <= x + 230) { currentTab = 2; return true; }
         }
 
-        // Клик по кнопкам (Все проверки идут независимо друг от друга!)
         if (mouseX >= bx && mouseX <= bx + bWidth) {
             if (currentTab == 0) {
                 if (mouseY >= startY && mouseY <= startY + 18) { 
