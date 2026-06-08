@@ -1,22 +1,20 @@
 {
   "schemaVersion": 1,
   "id": "auravisual",
-  "version": "1.1.0",
   "name": "AuraVisual",
-  "description": "Modern HUD and Combat utility mod",
-  "authors": ["Swill Way"],
-  "contact": {},
-  "license": "MIT",
-  "icon": "assets/auravisual/icon.png",
-  "environment": "*",
+  "version": "1.1.0",
+  "environment": "client",
   "entrypoints": {
     "client": [
-      "com.auravisual.AuraVisualClient"
+      "com.auravisual.AuraVisual"
     ]
   },
+  "mixins": [
+    "auravisual.mixins.json"
+  ],
   "depends": {
-    "fabricloader": ">=0.15.0",
-    "minecraft": "~1.21.4",
-    "java": ">=21"
+    "fabricloader": ">=0.14.0",
+    "minecraft": "~1.21",
+    "fabric-api": "*"
   }
 }
