@@ -13,28 +13,28 @@ public class ClickGUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        // Рендерим стандартный фон
+        // Рендерим стандартный фон затемнения игры
         this.renderBackground(context, mouseX, mouseY, delta);
 
-        // Фиксированные размеры окна меню, чтобы текст помещался идеально
+        // Строго фиксированные размеры окна, чтобы шрифты не плыли
         int width = 250;
         int height = 160; 
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
-        // Корпус меню
+        // Задний фон и верхняя декоративная полоса
         context.fill(x, y, x + width, y + height, 0xF60F0F0F); 
         context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
-        // Название чита и версия
+        // Название чита и текущая версия
         context.drawText(this.textRenderer, "AURA VISUAL", x + 14, y + 10, FeatureManager.clientColor, false);
         context.drawText(this.textRenderer, "v1.1.4", x + width - 50, y + 10, 0x50FFFFFF, false);
 
-        // Переключатель вкладок
+        // Отрисовка вкладок меню
         int tabY = y + 26;
         drawTabs(context, x, tabY, mouseX, mouseY);
 
-        // Линия-разделитель
+        // Горизонтальный разделитель
         context.fill(x + 12, y + 39, x + width - 12, y + 40, 0x20FFFFFF);
 
         int bx = x + 12;
@@ -42,7 +42,7 @@ public class ClickGUI extends Screen {
         int startY = y + 48;
         int stepY = 22;
 
-        // Контент выбранной категории
+        // Отображение элементов в зависимости от выбранной вкладки
         if (currentTab == 0) {
             drawBtn(context, bx, startY, bWidth, "TriggerBot (Криты)", FeatureManager.triggerBot, mouseX, mouseY);
         } 
@@ -77,7 +77,7 @@ public class ClickGUI extends Screen {
         
         String status = active ? "ON" : "OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x60FFFFFF;
-        // Задвигаем статус правее, чтобы текст названия на него не налезал
+        // Сдвиг вправо, чтобы текст названия функции и статус никогда не пересекались
         ctx.drawText(this.textRenderer, status, bx + bWidth - 32, by + 5, statusColor, false);
     }
 
@@ -106,11 +106,13 @@ public class ClickGUI extends Screen {
         int stepY = 22;
 
         int tabY = y + 26;
+        // Обработка кликов по вкладкам
         if (mouseY >= tabY && mouseY <= tabY + 14) {
             if (mouseX >= x + 14 && mouseX <= x + 49) { currentTab = 0; return true; }
             if (mouseX >= x + 65 && mouseX <= x + 120) { currentTab = 1; return true; }
         }
 
+        // Обработка кликов по кнопкам функций
         if (mouseX >= bx && mouseX <= bx + bWidth) {
             if (currentTab == 0) {
                 if (mouseY >= startY && mouseY <= startY + 18) { 
