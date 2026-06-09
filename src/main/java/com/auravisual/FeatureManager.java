@@ -9,13 +9,14 @@ public class FeatureManager {
     public static boolean armorHUD = false;
     public static boolean potionHUD = false;
     public static boolean glowESP = false;
+    public static boolean itemSwapVisual = false; // Кнопка, которую требовал ItemSwapLogic.java
 
     // Вкладка: Косметика
     public static boolean showWings = false;
     public static boolean showHat = false;
 
     // Системные настройки отображения меню
-    public static int clientColor = 0xFFFF0055; // Насыщенный розово-красный цвет интерфейса
+    public static int clientColor = 0xFFFF0055; // Розово-красный цвет темы
     public static int targetHudMode = 1;
     private static int colorIndex = 0;
 
