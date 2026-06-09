@@ -13,35 +13,36 @@ public class ClickGUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        // Рендерим стандартный фон
         this.renderBackground(context, mouseX, mouseY, delta);
 
-        // Фиксированные размеры, чтобы ничего не размазывалось
-        int width = 230;
+        // Фиксированные размеры окна меню, чтобы текст помещался идеально
+        int width = 250;
         int height = 160; 
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
-        // Основное окно
+        // Корпус меню
         context.fill(x, y, x + width, y + height, 0xF60F0F0F); 
         context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
-        // Заголовки (используем стандартный textRenderer)
-        context.drawText(this.textRenderer, "AURA VISUAL", x + 12, y + 10, FeatureManager.clientColor, false);
-        context.drawText(this.textRenderer, "v1.1.4", x + width - 45, y + 10, 0x50FFFFFF, false);
+        // Название чита и версия
+        context.drawText(this.textRenderer, "AURA VISUAL", x + 14, y + 10, FeatureManager.clientColor, false);
+        context.drawText(this.textRenderer, "v1.1.4", x + width - 50, y + 10, 0x50FFFFFF, false);
 
-        // Вкладки
+        // Переключатель вкладок
         int tabY = y + 26;
         drawTabs(context, x, tabY, mouseX, mouseY);
 
-        // Разделитель
-        context.fill(x + 10, y + 38, x + width - 10, y + 39, 0x20FFFFFF);
+        // Линия-разделитель
+        context.fill(x + 12, y + 39, x + width - 12, y + 40, 0x20FFFFFF);
 
         int bx = x + 12;
         int bWidth = width - 24;
         int startY = y + 48;
         int stepY = 22;
 
-        // Контент вкладок
+        // Контент выбранной категории
         if (currentTab == 0) {
             drawBtn(context, bx, startY, bWidth, "TriggerBot (Криты)", FeatureManager.triggerBot, mouseX, mouseY);
         } 
@@ -57,8 +58,8 @@ public class ClickGUI extends Screen {
 
     private void drawTabs(DrawContext context, int x, int tabY, int mouseX, int mouseY) {
         String[] names = {"[БОЙ]", "[ВИЗУАЛЫ]"};
-        int[] offsets = {12, 65};
-        int[] widths = {40, 55}; 
+        int[] offsets = {14, 65};
+        int[] widths = {35, 55}; 
         
         for (int i = 0; i < names.length; i++) {
             boolean hovered = mouseX >= x + offsets[i] && mouseX <= x + offsets[i] + widths[i] && mouseY >= tabY && mouseY <= tabY + 12;
@@ -76,7 +77,8 @@ public class ClickGUI extends Screen {
         
         String status = active ? "ON" : "OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x60FFFFFF;
-        ctx.drawText(this.textRenderer, status, bx + bWidth - 28, by + 5, statusColor, false);
+        // Задвигаем статус правее, чтобы текст названия на него не налезал
+        ctx.drawText(this.textRenderer, status, bx + bWidth - 32, by + 5, statusColor, false);
     }
 
     private void drawColorBtn(DrawContext ctx, int bx, int by, int bWidth, String name, int mx, int my) {
@@ -86,14 +88,14 @@ public class ClickGUI extends Screen {
         ctx.fill(bx, by, bx + bWidth, by + 18, bgColor);
         ctx.fill(bx, by, bx + 3, by + 18, FeatureManager.clientColor);
         ctx.drawText(this.textRenderer, name, bx + 10, by + 5, 0xFFFFFFFF, false);
-        ctx.drawText(this.textRenderer, "[ СМЕНИТЬ ]", bx + bWidth - 65, by + 5, FeatureManager.clientColor, false);
+        ctx.drawText(this.textRenderer, "[ СМЕНИТЬ ]", bx + bWidth - 68, by + 5, FeatureManager.clientColor, false);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button != 0) return false; 
 
-        int width = 230;
+        int width = 250;
         int height = 160;
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
@@ -105,7 +107,7 @@ public class ClickGUI extends Screen {
 
         int tabY = y + 26;
         if (mouseY >= tabY && mouseY <= tabY + 14) {
-            if (mouseX >= x + 12 && mouseX <= x + 52) { currentTab = 0; return true; }
+            if (mouseX >= x + 14 && mouseX <= x + 49) { currentTab = 0; return true; }
             if (mouseX >= x + 65 && mouseX <= x + 120) { currentTab = 1; return true; }
         }
 
