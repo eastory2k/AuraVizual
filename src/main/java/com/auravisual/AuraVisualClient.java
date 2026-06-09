@@ -14,78 +14,109 @@ public class AuraVisualClient {
 
     private static long lastAttackTime = 0L;
     private static long currentDelay = 0L;
+    private static long timeTargetInView = 0L;
     private static final Random random = new Random();
 
-    private static final double ASSIST_RANGE = 4.5; 
-    private static final float ASSIST_SPEED = 3.5f; 
+    // Настройки дистанции и отзывчивости для плотного боя
+    private static final double COMBAT_RANGE = 4.1; 
+    private static final float SMOOTHING_FACTOR = 3.8f; 
 
     public static void onClientTick(MinecraftClient mc) {
         if (mc.player == null || mc.world == null) return;
 
         if (FeatureManager.triggerBot) {
-            runAimAssist(mc);
-            runSmartTriggerBot(mc);
+            LivingEntity target = findValidTarget(mc);
+            if (target != null) {
+                applyAimedSmoothing(mc, target);
+            }
+            processOptimizedTrigger(mc);
         }
     }
 
-    private static void runSmartTriggerBot(MinecraftClient mc) {
+    private static LivingEntity findValidTarget(MinecraftClient mc) {
+        LivingEntity closest = null;
+        double closestDist = COMBAT_RANGE;
+
+        for (Entity entity : mc.world.getEntities()) {
+            if (entity instanceof LivingEntity && entity.isAlive() && entity != mc.player) {
+                // Игнорируем энтити, которые игрок физически не видит (защита от проверки углов сквозь стены)
+                if (!mc.player.canSee(entity) || entity.isInvisible()) continue;
+
+                double dist = mc.player.distanceTo(entity);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = (LivingEntity) entity;
+                }
+            }
+        }
+        return closest;
+    }
+
+    private static void applyAimedSmoothing(MinecraftClient mc, LivingEntity target) {
+        // Наводка на область шеи/груди вместо центра головы для более естественной траектории
+        Vec3d targetPos = target.getEyePos().subtract(0, 0.20, 0);
+        Vec3d playerPos = mc.player.getEyePos();
+
+        double dX = targetPos.x - playerPos.x;
+        double dY = targetPos.y - playerPos.y;
+        double dZ = targetPos.z - playerPos.z;
+        double dXZ = MathHelper.sqrt((float) (dX * dX + dZ * dZ));
+
+        float targetYaw = (float) (MathHelper.atan2(dZ, dX) * 180.0 / MathHelper.PI) - 90.0f;
+        float targetPitch = (float) (-(MathHelper.atan2(dY, dXZ) * 180.0 / MathHelper.PI));
+
+        // Введение шума (микро-смещения мыши, имитирующие дрожание руки)
+        float noiseX = (random.nextFloat() - 0.5f) * 0.15f;
+        float noiseY = (random.nextFloat() - 0.5f) * 0.10f;
+
+        float diffYaw = MathHelper.wrapDegrees(targetYaw - mc.player.getYaw()) + noiseX;
+        float diffPitch = MathHelper.wrapDegrees(targetPitch - mc.player.getPitch()) + noiseY;
+
+        // Скорость подстраивается под угол наклона: чем ближе прицел, тем незаметнее доводка
+        float speedModifier = Math.abs(diffYaw) < 4.0f ? 2.0f : 0.0f;
+        float finalSpeed = SMOOTHING_FACTOR + speedModifier;
+
+        mc.player.setYaw(mc.player.getYaw() + diffYaw / finalSpeed);
+        mc.player.setPitch(mc.player.getPitch() + diffPitch / finalSpeed);
+    }
+
+    private static void processOptimizedTrigger(MinecraftClient mc) {
         HitResult hitResult = mc.crosshairTarget;
         
         if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
             EntityHitResult entityHitResult = (EntityHitResult) hitResult;
-            Entity target = entityHitResult.getEntity();
+            Entity entity = entityHitResult.getEntity();
 
-            if (target instanceof LivingEntity && target.isAlive() && target != mc.player) {
-                long currentTime = System.currentTimeMillis();
+            if (entity instanceof LivingEntity && entity.isAlive() && entity != mc.player) {
+                if (timeTargetInView == 0L) {
+                    timeTargetInView = System.currentTimeMillis();
+                }
+
+                long now = System.currentTimeMillis();
                 
-                if (currentTime - lastAttackTime < currentDelay) return;
+                // Эмуляция физической реакции (минимальный порог задержки перед началом серии ударов)
+                if (now - timeTargetInView < (50 + random.nextInt(30))) return;
+                if (now - lastAttackTime < currentDelay) return;
 
-                boolean isCritPhase = !mc.player.isOnGround() 
-                        && mc.player.fallDistance > 0.0F 
+                // Определение окна для совершения критического удара
+                boolean isFalling = !mc.player.isOnGround() 
+                        && mc.player.fallDistance > 0.02F 
                         && !mc.player.isClimbing() 
                         && !mc.player.isTouchingWater();
 
-                if (isCritPhase) {
+                if (isFalling) {
                     if (mc.interactionManager != null) {
-                        mc.interactionManager.attackEntity(mc.player, target);
+                        mc.interactionManager.attackEntity(mc.player, entity);
                         mc.player.swingHand(Hand.MAIN_HAND);
                         
-                        lastAttackTime = currentTime;
-                        currentDelay = 100 + random.nextInt(45); 
+                        lastAttackTime = now;
+                        // Синусоидальный разброс паузы для генерации рваного CPS (в среднем 12-15 ударов)
+                        currentDelay = 65 + (long)(Math.sin(now) * 15) + random.nextInt(25); 
                     }
                 }
             }
-        }
-    }
-
-    private static void runAimAssist(MinecraftClient mc) {
-        LivingEntity closestTarget = null;
-        double closestDist = ASSIST_RANGE;
-
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof LivingEntity && entity.isAlive() && entity != mc.player) {
-                double dist = mc.player.distanceTo(entity);
-                if (dist < closestDist) {
-                    closestDist = dist;
-                    closestTarget = (LivingEntity) entity;
-                }
-            }
-        }
-
-        if (closestTarget != null) {
-            Vec3d targetPos = closestTarget.getEyePos();
-            Vec3d playerPos = mc.player.getEyePos();
-
-            double diffX = targetPos.x - playerPos.x;
-            double diffY = targetPos.y - playerPos.y;
-            double diffZ = targetPos.z - playerPos.z;
-            double diffXZ = MathHelper.sqrt((float) (diffX * diffX + diffZ * diffZ));
-
-            float targetYaw = (float) (MathHelper.atan2(diffZ, diffX) * 180.0 / MathHelper.PI) - 90.0f;
-            float targetPitch = (float) (-(MathHelper.atan2(diffY, diffXZ) * 180.0 / MathHelper.PI));
-
-            mc.player.setYaw(mc.player.getYaw() + MathHelper.wrapDegrees(targetYaw - mc.player.getYaw()) / ASSIST_SPEED);
-            mc.player.setPitch(mc.player.getPitch() + MathHelper.wrapDegrees(targetPitch - mc.player.getPitch()) / ASSIST_SPEED);
+        } else {
+            timeTargetInView = 0L; // Сброс таймера реакции при потере цели из перекрестия
         }
     }
 }
