@@ -1,32 +1,18 @@
 package com.auravisual;
 
 public class FeatureManager {
-    // Вкладка: Бой
     public static boolean triggerBot = false;
-
-    // Вкладка: Визуалы
     public static boolean targetHUD = false;
     public static boolean armorHUD = false;
-    public static boolean potionHUD = false;
-    public static boolean glowESP = false;
-    public static boolean itemSwapVisual = false; // Кнопка, которую требовал ItemSwapLogic.java
+    public static boolean itemSwapVisual = false;
 
-    // Вкладка: Косметика
-    public static boolean showWings = false;
-    public static boolean showHat = false;
-
-    // Системные настройки отображения меню
-    public static int clientColor = 0xFFFF0055; // Розово-красный цвет темы
-    public static int targetHudMode = 1;
-    private static int colorIndex = 0;
+    public static int clientColor = 0xFF00FFCC; // По умолчанию красивый цвет Аква
+    private static int colorIndex = 1;
 
     public static String getColorName() {
-        switch (colorIndex) {
-            case 0: return "Розовый";
-            case 1: return "Аква";
-            case 2: return "Зеленый";
-            default: return "Розовый";
-        }
+        if (colorIndex == 0) return "Розовый";
+        if (colorIndex == 1) return "Аква";
+        return "Зеленый";
     }
 
     public static void toggleColor() {
