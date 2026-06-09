@@ -1,37 +1,39 @@
 package com.auravisual;
 
 public class FeatureManager {
-    public static int clientColor = 0xFFFF0000;
-
+    // Вкладка: Бой
     public static boolean triggerBot = false;
+
+    // Вкладка: Визуалы
     public static boolean targetHUD = false;
     public static boolean armorHUD = false;
     public static boolean potionHUD = false;
     public static boolean glowESP = false;
-    public static boolean soulSight = false;
-    public static boolean customParticles = false;
-    public static boolean itemSwapVisual = false;
-    
+
+    // Вкладка: Косметика
     public static boolean showWings = false;
     public static boolean showHat = false;
-    public static boolean showDemonicRays = false;
 
+    // Системные настройки отображения меню
+    public static int clientColor = 0xFFFF0055; // Насыщенный розово-красный цвет интерфейса
     public static int targetHudMode = 1;
+    private static int colorIndex = 0;
 
     public static String getColorName() {
-        if (clientColor == 0xFFFF0000) return "Красный";
-        if (clientColor == 0xFF00FF00) return "Зеленый";
-        if (clientColor == 0xFF0000FF) return "Синий";
-        return "Кастомный";
+        switch (colorIndex) {
+            case 0: return "Розовый";
+            case 1: return "Аква";
+            case 2: return "Зеленый";
+            default: return "Розовый";
+        }
     }
 
     public static void toggleColor() {
-        if (clientColor == 0xFFFF0000) {
-            clientColor = 0xFF00FF00;
-        } else if (clientColor == 0xFF00FF00) {
-            clientColor = 0xFF0000FF;
-        } else {
-            clientColor = 0xFFFF0000;
-        }
+        colorIndex++;
+        if (colorIndex > 2) colorIndex = 0;
+
+        if (colorIndex == 0) clientColor = 0xFFFF0055;
+        if (colorIndex == 1) clientColor = 0xFF00FFCC;
+        if (colorIndex == 2) clientColor = 0xFF00FF66;
     }
 }
