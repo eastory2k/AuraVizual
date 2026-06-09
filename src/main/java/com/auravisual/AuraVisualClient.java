@@ -16,7 +16,7 @@ public class AuraVisualClient {
     private static final Random random = new Random();
 
     public static void onClientTick(MinecraftClient mc) {
-        // Если игрок не в мире или триггербот выключен в меню — выходим
+        // Если игрок не зашел в мир или функция отключена в GUI — прерываем выполнение
         if (mc.player == null || mc.world == null || !FeatureManager.triggerBot) return;
 
         processBypassTrigger(mc);
@@ -25,43 +25,44 @@ public class AuraVisualClient {
     private static void processBypassTrigger(MinecraftClient mc) {
         HitResult hitResult = mc.crosshairTarget;
         
-        // Проверяем, наведен ли крестик на сущность
+        // Проверяем, наведен ли прицел игрока на какую-либо сущность
         if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
             EntityHitResult entityHitResult = (EntityHitResult) hitResult;
             Entity entity = entityHitResult.getEntity();
 
-            // Проверяем, что цель жива, это игрок/моб и это не мы сами
+            // Проверяем, что цель является живым мобом/игроком, она жива и это не сам игрок
             if (entity instanceof LivingEntity && entity.isAlive() && entity != mc.player) {
-                // Защита от ударов сквозь стены и по полным невидимкам (анти-бот проверка античитов)
+                // Защита от проверки античитов (не бьем сквозь стены и игнорируем полных невидимок)
                 if (!mc.player.canSee(entity) || entity.isInvisible()) return;
 
                 long now = System.currentTimeMillis();
 
-                // Фикс для SlothAc: если только навелись, запускаем таймер реакции человека
+                // Обход SlothAc: если только навели прицел, фиксируем время начала наводки
                 if (timeTargetInView == 0L) {
                     timeTargetInView = now;
                 }
                 
-                // Имитируем задержку реакции (~25-45 мс). Мгновенный удар вызовет бан
+                // Имитация человеческой реакции (пауза 25-45 миллисекунд перед первым ударом)
                 if (now - timeTargetInView < (25 + random.nextInt(20))) return;
                 
-                // Фикс для PolarAc: проверка динамической задержки между кликами (CPS)
+                // Проверка плавающей задержки клика (CPS)
                 if (now - lastAttackTime < currentDelay) return;
 
-                // Бьем цель через официальный менеджер игры
+                // Наносим удар через официальный менеджер взаимодействий Minecraft
                 if (mc.interactionManager != null) {
                     mc.interactionManager.attackEntity(mc.player, entity);
-                    mc.player.swingHand(Hand.MAIN_HAND); // Синхронный пакет взмаха для FunTime
+                    // Обязательный взмах рукой в тот же тик, чтобы FunTime регистрировал урон и не кикал
+                    mc.player.swingHand(Hand.MAIN_HAND); 
                     
                     lastAttackTime = now;
                     
-                    // ГЕНЕРАЦИЯ ОБХОДА: ломаем тайминги синусоидой + случайным шумом.
-                    // Выдает плавающий CPS от 11 до 16 ударов, который невозможно отследить алгоритмами.
+                    // Обход PolarAc: ломаем паттерны кликов с помощью синусоиды и случайного шума.
+                    // Создает рваный CPS в районе 11-16 ударов, который невозможно задетектить алгоритмами.
                     currentDelay = 60 + (long)(Math.sin(now) * 12) + random.nextInt(25); 
                 }
             }
         } else {
-            // Если увели прицел с врага — сбрасываем таймер наводки
+            // Если увели прицел с врага — сбрасываем таймер человеческой реакции
             timeTargetInView = 0L;
         }
     }
