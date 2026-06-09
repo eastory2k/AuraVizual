@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 public class ClickGUI extends Screen {
-    private int currentTab = 0; 
+    private int currentTab = 0; // 0 - Бой, 1 - Визуалы
 
     public ClickGUI() {
         super(Text.literal("AuraVisual ClickGUI"));
@@ -15,50 +15,50 @@ public class ClickGUI extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
 
-        int width = 240;
-        int height = 190; 
+        // Фиксированные размеры, чтобы ничего не размазывалось
+        int width = 230;
+        int height = 160; 
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
 
+        // Основное окно
         context.fill(x, y, x + width, y + height, 0xF60F0F0F); 
         context.fill(x, y, x + width, y + 2, FeatureManager.clientColor); 
 
-        context.drawText(this.textRenderer, "AURA VISUAL // MENU", x + 12, y + 10, FeatureManager.clientColor, false);
-        context.drawText(this.textRenderer, "v1.1.0 (1.21.4)", x + width - 75, y + 10, 0x50FFFFFF, false);
+        // Заголовки (используем стандартный textRenderer)
+        context.drawText(this.textRenderer, "AURA VISUAL", x + 12, y + 10, FeatureManager.clientColor, false);
+        context.drawText(this.textRenderer, "v1.1.4", x + width - 45, y + 10, 0x50FFFFFF, false);
 
+        // Вкладки
         int tabY = y + 26;
         drawTabs(context, x, tabY, mouseX, mouseY);
 
-        context.fill(x + 10, y + 42, x + width - 10, y + 43, 0x20FFFFFF);
+        // Разделитель
+        context.fill(x + 10, y + 38, x + width - 10, y + 39, 0x20FFFFFF);
 
         int bx = x + 12;
         int bWidth = width - 24;
-        int startY = y + 52;
+        int startY = y + 48;
         int stepY = 22;
 
+        // Контент вкладок
         if (currentTab == 0) {
-            drawBtn(context, bx, startY, bWidth, "TriggerBot (Только Криты)", FeatureManager.triggerBot, mouseX, mouseY);
+            drawBtn(context, bx, startY, bWidth, "TriggerBot (Криты)", FeatureManager.triggerBot, mouseX, mouseY);
         } 
         else if (currentTab == 1) {
             drawBtn(context, bx, startY, bWidth, "TargetHUD", FeatureManager.targetHUD, mouseX, mouseY);
             drawBtn(context, bx, startY + stepY, bWidth, "ArmorHUD", FeatureManager.armorHUD, mouseX, mouseY);
-            drawBtn(context, bx, startY + stepY * 2, bWidth, "PotionHUD", FeatureManager.potionHUD, mouseX, mouseY);
-            drawBtn(context, bx, startY + stepY * 3, bWidth, "Glow / ESP", FeatureManager.glowESP, mouseX, mouseY);
-            drawBtn(context, bx, startY + stepY * 4, bWidth, "ItemSwap Visual", FeatureManager.itemSwapVisual, mouseX, mouseY);
-            drawColorBtn(context, bx, startY + stepY * 5, bWidth, "Цвет Мода: " + FeatureManager.getColorName(), mouseX, mouseY);
-        } 
-        else if (currentTab == 2) {
-            drawBtn(context, bx, startY, bWidth, "Кастомные Крылья", FeatureManager.showWings, mouseX, mouseY);
-            drawBtn(context, bx, startY + stepY, bWidth, "Призрачный Нимб", FeatureManager.showHat, mouseX, mouseY);
+            drawBtn(context, bx, startY + stepY * 2, bWidth, "ItemSwap Visual", FeatureManager.itemSwapVisual, mouseX, mouseY);
+            drawColorBtn(context, bx, startY + stepY * 4, bWidth, "Цвет: " + FeatureManager.getColorName(), mouseX, mouseY);
         }
 
         super.render(context, mouseX, mouseY, delta);
     }
 
     private void drawTabs(DrawContext context, int x, int tabY, int mouseX, int mouseY) {
-        String[] names = {"[БОЙ]", "[ВИЗУАЛЫ]", "[КОСМЕТИКА]"};
-        int[] offsets = {12, 70, 150};
-        int[] widths = {45, 60, 65}; 
+        String[] names = {"[БОЙ]", "[ВИЗУАЛЫ]"};
+        int[] offsets = {12, 65};
+        int[] widths = {40, 55}; 
         
         for (int i = 0; i < names.length; i++) {
             boolean hovered = mouseX >= x + offsets[i] && mouseX <= x + offsets[i] + widths[i] && mouseY >= tabY && mouseY <= tabY + 12;
@@ -76,8 +76,7 @@ public class ClickGUI extends Screen {
         
         String status = active ? "ON" : "OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x60FFFFFF;
-        
-        ctx.drawText(this.textRenderer, status, bx + bWidth - 30, by + 5, statusColor, false);
+        ctx.drawText(this.textRenderer, status, bx + bWidth - 28, by + 5, statusColor, false);
     }
 
     private void drawColorBtn(DrawContext ctx, int bx, int by, int bWidth, String name, int mx, int my) {
@@ -94,21 +93,20 @@ public class ClickGUI extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button != 0) return false; 
 
-        int width = 240;
-        int height = 190;
+        int width = 230;
+        int height = 160;
         int x = (this.width - width) / 2;
         int y = (this.height - height) / 2;
         
         int bx = x + 12;
         int bWidth = width - 24;
-        int startY = y + 52;
+        int startY = y + 48;
         int stepY = 22;
 
         int tabY = y + 26;
         if (mouseY >= tabY && mouseY <= tabY + 14) {
-            if (mouseX >= x + 12 && mouseX <= x + 57) { currentTab = 0; return true; }
-            if (mouseX >= x + 70 && mouseX <= x + 130) { currentTab = 1; return true; }
-            if (mouseX >= x + 150 && mouseX <= x + 215) { currentTab = 2; return true; }
+            if (mouseX >= x + 12 && mouseX <= x + 52) { currentTab = 0; return true; }
+            if (mouseX >= x + 65 && mouseX <= x + 120) { currentTab = 1; return true; }
         }
 
         if (mouseX >= bx && mouseX <= bx + bWidth) {
@@ -121,14 +119,8 @@ public class ClickGUI extends Screen {
             else if (currentTab == 1) {
                 if (mouseY >= startY && mouseY <= startY + 18) { FeatureManager.targetHUD = !FeatureManager.targetHUD; return true; }
                 if (mouseY >= startY + stepY && mouseY <= startY + stepY + 18) { FeatureManager.armorHUD = !FeatureManager.armorHUD; return true; }
-                if (mouseY >= startY + stepY * 2 && mouseY <= startY + stepY * 2 + 18) { FeatureManager.potionHUD = !FeatureManager.potionHUD; return true; }
-                if (mouseY >= startY + stepY * 3 && mouseY <= startY + stepY * 3 + 18) { FeatureManager.glowESP = !FeatureManager.glowESP; return true; }
-                if (mouseY >= startY + stepY * 4 && mouseY <= startY + stepY * 4 + 18) { FeatureManager.itemSwapVisual = !FeatureManager.itemSwapVisual; return true; }
-                if (mouseY >= startY + stepY * 5 && mouseY <= startY + stepY * 5 + 18) { FeatureManager.toggleColor(); return true; }
-            } 
-            else if (currentTab == 2) {
-                if (mouseY >= startY && mouseY <= startY + 18) { FeatureManager.showWings = !FeatureManager.showWings; return true; }
-                if (mouseY >= startY + stepY && mouseY <= startY + stepY + 18) { FeatureManager.showHat = !FeatureManager.showHat; return true; }
+                if (mouseY >= startY + stepY * 2 && mouseY <= startY + stepY * 2 + 18) { FeatureManager.itemSwapVisual = !FeatureManager.itemSwapVisual; return true; }
+                if (mouseY >= startY + stepY * 4 && mouseY <= startY + stepY * 4 + 18) { FeatureManager.toggleColor(); return true; }
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
