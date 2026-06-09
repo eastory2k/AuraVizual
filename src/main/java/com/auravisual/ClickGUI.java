@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 public class ClickGUI extends Screen {
-    private int currentTab = 0; // 0 - Бой, 1 - Визуалы, 2 - Косметика
+    private int currentTab = 0; 
 
     public ClickGUI() {
         super(Text.literal("AuraVisual ClickGUI"));
@@ -40,10 +40,11 @@ public class ClickGUI extends Screen {
             drawBtn(context, bx, startY, bWidth, "TriggerBot (Только Криты)", FeatureManager.triggerBot, mouseX, mouseY);
         } 
         else if (currentTab == 1) {
-            drawBtn(context, bx, startY, bWidth, "TargetHUD (Инфо о цели)", FeatureManager.targetHUD, mouseX, mouseY);
-            drawBtn(context, bx, startY + stepY, bWidth, "ArmorHUD (Броня на экране)", FeatureManager.armorHUD, mouseX, mouseY);
-            drawBtn(context, bx, startY + stepY * 2, bWidth, "PotionHUD (Эффекты)", FeatureManager.potionHUD, mouseX, mouseY);
-            drawBtn(context, bx, startY + stepY * 3, bWidth, "Glow / ESP (Подсветка предметов)", FeatureManager.glowESP, mouseX, mouseY);
+            drawBtn(context, bx, startY, bWidth, "TargetHUD", FeatureManager.targetHUD, mouseX, mouseY);
+            drawBtn(context, bx, startY + stepY, bWidth, "ArmorHUD", FeatureManager.armorHUD, mouseX, mouseY);
+            drawBtn(context, bx, startY + stepY * 2, bWidth, "PotionHUD", FeatureManager.potionHUD, mouseX, mouseY);
+            drawBtn(context, bx, startY + stepY * 3, bWidth, "Glow / ESP", FeatureManager.glowESP, mouseX, mouseY);
+            drawBtn(context, bx, startY + stepY * 4, bWidth, "ItemSwap Visual", FeatureManager.itemSwapVisual, mouseX, mouseY);
             drawColorBtn(context, bx, startY + stepY * 5, bWidth, "Цвет Мода: " + FeatureManager.getColorName(), mouseX, mouseY);
         } 
         else if (currentTab == 2) {
@@ -75,6 +76,7 @@ public class ClickGUI extends Screen {
         
         String status = active ? "ON" : "OFF";
         int statusColor = active ? FeatureManager.clientColor : 0x60FFFFFF;
+        
         ctx.drawText(this.textRenderer, status, bx + bWidth - 30, by + 5, statusColor, false);
     }
 
@@ -121,6 +123,7 @@ public class ClickGUI extends Screen {
                 if (mouseY >= startY + stepY && mouseY <= startY + stepY + 18) { FeatureManager.armorHUD = !FeatureManager.armorHUD; return true; }
                 if (mouseY >= startY + stepY * 2 && mouseY <= startY + stepY * 2 + 18) { FeatureManager.potionHUD = !FeatureManager.potionHUD; return true; }
                 if (mouseY >= startY + stepY * 3 && mouseY <= startY + stepY * 3 + 18) { FeatureManager.glowESP = !FeatureManager.glowESP; return true; }
+                if (mouseY >= startY + stepY * 4 && mouseY <= startY + stepY * 4 + 18) { FeatureManager.itemSwapVisual = !FeatureManager.itemSwapVisual; return true; }
                 if (mouseY >= startY + stepY * 5 && mouseY <= startY + stepY * 5 + 18) { FeatureManager.toggleColor(); return true; }
             } 
             else if (currentTab == 2) {
